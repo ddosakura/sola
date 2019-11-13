@@ -18,12 +18,14 @@ type Meta struct {
 
 // Router Middleware
 type Router struct {
+	Prefix string
 	routes map[string]*Meta
 }
 
 // New Router
 func New() *Router {
 	return &Router{
+		Prefix: "",
 		routes: map[string]*Meta{},
 	}
 }
@@ -48,7 +50,12 @@ func (r *Router) Routes() middleware.Middleware {
 				continue
 			}
 
-			_, _, URLs := parse(req.URL.String())
+			URL := req.URL.String()
+			if !strings.HasPrefix(URL, r.Prefix) {
+				continue
+			}
+			URL = strings.Replace(URL, r.Prefix, "", 1)
+			_, _, URLs := parse(URL)
 			if len(URLs) < len(meta.urls) {
 				continue
 			}

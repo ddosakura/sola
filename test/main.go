@@ -19,16 +19,20 @@ func hw(c middleware.Context, next middleware.Next) {
 
 func main() {
 	r := router.New()
+	r.Prefix = "/p" // 设置路由前缀
 
 	// 测试路由匹配
 	r.Bind("127.0.0.1:3001/a", func(c middleware.Context, next middleware.Next) {
 		fmt.Println("A1")
+		c[sola.Response].(http.ResponseWriter).Write([]byte("A1"))
 	})
 	r.Bind("POST /a", func(c middleware.Context, next middleware.Next) {
 		fmt.Println("A2")
+		c[sola.Response].(http.ResponseWriter).Write([]byte("A2"))
 	})
 	r.Bind("/a", func(c middleware.Context, next middleware.Next) {
 		fmt.Println("A3")
+		c[sola.Response].(http.ResponseWriter).Write([]byte("A3"))
 	})
 
 	// 测试 Merge
@@ -50,10 +54,17 @@ func main() {
 	}
 	r.Bind("/b/:id", middleware.Merge(b1, b2, b3))
 
+	r2 := router.New()
+	r2.Bind("/b", func(c middleware.Context, next middleware.Next) {
+		fmt.Println("r2 - B")
+		c[sola.Response].(http.ResponseWriter).Write([]byte("r2 - B"))
+	})
+
 	// 测试 Favicon
 	app := sola.New()
 	app.Use(favicon.Favicon("http://fanyi.bdstatic.com/static/translation/img/favicon/favicon-32x32_ca689c3.png"))
 	app.Use(r.Routes())
+	app.Use(r2.Routes())
 
 	// 测试 Backup
 	sola.Listen("127.0.0.1:3000", app)
