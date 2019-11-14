@@ -40,7 +40,6 @@ func (r *Router) Bind(match string, m middleware.Middleware) {
 func (r *Router) Routes() middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
 		req := c[sola.Request].(*http.Request)
-		w := c[sola.Response].(http.ResponseWriter)
 	Match:
 		for _, meta := range r.routes {
 			if meta.method != "" && meta.method != req.Method {
@@ -75,14 +74,13 @@ func (r *Router) Routes() middleware.Middleware {
 				params[k] = v
 			}
 			for k, v := range params {
-				c["router.param."+k] = v
+				c[CtxParam(k)] = v
 			}
 			meta.m(c, next)
 			return
 		}
 		if next == nil {
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte("Not Found"))
+			sola.Text(c, "Not Found", http.StatusNotFound)
 			return
 		}
 		next()

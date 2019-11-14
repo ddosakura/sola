@@ -15,8 +15,7 @@ import (
 )
 
 func hw(c middleware.Context, next middleware.Next) {
-	w := c[sola.Response].(http.ResponseWriter)
-	w.Write([]byte("Hello World!"))
+	sola.Text(c, "Hello World")
 }
 
 func main() {
@@ -129,7 +128,10 @@ func main() {
 	app.Use(r3.Routes())
 
 	// 测试静态文件
-	app.Use(static.New("static"))
+	r4 := router.New()
+	r4.Prefix = "/static"
+	r4.Bind("/", static.New("static"))
+	app.Use(r4.Routes())
 
 	// 测试 Backup
 	sola.Listen("127.0.0.1:3000", app)

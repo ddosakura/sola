@@ -18,3 +18,10 @@ func basePass(string, string) bool {
 
 const jwtAuthPrefix = "Bearer "
 const authCookieCacheKey = "Sola-Authorization"
+
+// Context Key
+const (
+	CtxUsername = "auth.username"
+	CtxPassword = "auth.password"
+	CtxClaims   = "auth.claims"
+)

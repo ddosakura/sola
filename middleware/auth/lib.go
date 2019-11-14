@@ -42,8 +42,8 @@ func Sign(t Type, key interface{}) middleware.Middleware {
 func signBase(c middleware.Context, next middleware.Next) {
 	// 可取代浏览器默认弹窗的方式
 	w := c[sola.Response].(http.ResponseWriter)
-	username, ok1 := c["auth.username"].(string)
-	password, ok2 := c["auth.password"].(string)
+	username, ok1 := c[CtxUsername].(string)
+	password, ok2 := c[CtxPassword].(string)
 	if !ok1 || !ok2 {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -58,7 +58,7 @@ func signBase(c middleware.Context, next middleware.Next) {
 func signJWT(key interface{}) middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
 		w := c[sola.Response].(http.ResponseWriter)
-		tmp := c["auth.claims"]
+		tmp := c[CtxClaims]
 		if tmp == nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -100,16 +100,14 @@ func authBase(check BaseCheck) middleware.Middleware {
 		if !ok {
 			// TODO: custom
 			w.Header().Add("WWW-Authenticate", "Basic realm=\"sola\"")
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Unauthorized"))
+			sola.Text(c, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		if check(username, password) {
 			next()
 		} else {
 			// TODO: custom
-			w.WriteHeader(http.StatusForbidden)
-			w.Write([]byte("Forbidden"))
+			sola.Text(c, "Forbidden", http.StatusForbidden)
 		}
 	}
 }
@@ -124,8 +122,7 @@ func authJWT(key interface{}) middleware.Middleware {
 		if !ok {
 			// TODO: custom
 			w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Unauthorized"))
+			sola.Text(c, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 
@@ -140,18 +137,16 @@ func authJWT(key interface{}) middleware.Middleware {
 		if token == nil {
 			// TODO: custom
 			w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("Unauthorized"))
+			sola.Text(c, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 			var tmp map[string]interface{} = claims
-			c["auth.claims"] = tmp
+			c[CtxClaims] = tmp
 			next()
 		} else {
 			// TODO: custom
-			w.WriteHeader(http.StatusForbidden)
-			w.Write([]byte("Forbidden"))
+			sola.Text(c, "Forbidden", http.StatusForbidden)
 		}
 	}
 }

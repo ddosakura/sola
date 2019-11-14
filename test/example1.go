@@ -16,11 +16,10 @@ func example1() {
 
 	app.Use(func(c middleware.Context, next middleware.Next) {
 		r := c[sola.Request].(*http.Request)
-		w := c[sola.Response].(http.ResponseWriter)
 		if r.URL.String() != "/favicon.ico" {
 			next()
 			s := c[key].(string)
-			w.Write([]byte(s))
+			sola.Text(c, s)
 		}
 	})
 
