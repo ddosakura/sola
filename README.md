@@ -31,11 +31,11 @@ func main() {
 
 ### More Demo
 
-+ [Base Auth](blob/master/demo/base-auth/main.go)
-+ [favicon、static、backup](blob/master/demo/favicon-static-backup/main.go)
-+ [Hello World](blob/master/demo/hello-world/main.go)
-+ [路由&认证 (router、auth)](blob/master/demo/router-auth/main.go)
-+ [完整的注册、登录、鉴权例子](blob/master/demo/simple-app)
++ [Base Auth](demo/base-auth/main.go)
++ [favicon、static、backup](demo/favicon-static-backup/main.go)
++ [Hello World](demo/hello-world/main.go)
++ [路由&认证 (router、auth)](demo/router-auth/main.go)
++ [完整的注册、登录、鉴权例子](demo/simple-app)
 
 ## About Writer
 
