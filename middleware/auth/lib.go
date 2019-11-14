@@ -99,8 +99,8 @@ func authBase(check BaseCheck) middleware.Middleware {
 		username, password, ok := r.BasicAuth()
 		if !ok {
 			// TODO: custom
+			w.Header().Add("WWW-Authenticate", "Basic realm=\"sola\"")
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Header().Set("WWW-Authenticate", "Basic realm=\"sola\"")
 			w.Write([]byte("Unauthorized"))
 			return
 		}
@@ -123,8 +123,8 @@ func authJWT(key interface{}) middleware.Middleware {
 		tokenString, ok := parseBearerAuth(auth)
 		if !ok {
 			// TODO: custom
+			w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Header().Set("WWW-Authenticate", jwtAuthPrefix)
 			w.Write([]byte("Unauthorized"))
 			return
 		}
@@ -139,8 +139,8 @@ func authJWT(key interface{}) middleware.Middleware {
 
 		if token == nil {
 			// TODO: custom
+			w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Header().Set("WWW-Authenticate", jwtAuthPrefix)
 			w.Write([]byte("Unauthorized"))
 			return
 		}

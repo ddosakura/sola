@@ -112,6 +112,15 @@ func main() {
 	}))
 	r3.Bind("/base", auth.New(base, nil, hw))
 
+	// 测试 JSON Writer
+	r3.Bind("/json", func(c middleware.Context, next middleware.Next) {
+		sola.JSON(c, &MyResponse{
+			Code: 0,
+			Msg:  "Success",
+			Data: "Hello World!",
+		})
+	})
+
 	// 测试 Favicon
 	app := sola.New()
 	app.Use(favicon.New("http://fanyi.bdstatic.com/static/translation/img/favicon/favicon-32x32_ca689c3.png"))
@@ -127,4 +136,11 @@ func main() {
 	bak := backup.App("127.0.0.1:3000")
 	sola.Listen("127.0.0.1:3001", bak)
 	sola.Keep()
+}
+
+// MyResponse for json writer
+type MyResponse struct {
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
 }

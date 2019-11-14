@@ -10,22 +10,17 @@ A simple golang web framwork based middleware.
 package main
 
 import (
-	"net/http"
-
 	"github.com/ddosakura/sola"
 	"github.com/ddosakura/sola/middleware"
-	"github.com/ddosakura/sola/middleware/favicon"
 )
 
 func main() {
 	// Sola
-	app := sola.New()                                                                                          // 创建 Sola App
-	app.Use(favicon.New("http://fanyi.bdstatic.com/static/translation/img/favicon/favicon-32x32_ca689c3.png")) // 设置 Favicon
+	app := sola.New() // 创建 Sola App
 
 	// 核心部分
 	app.Use(func(c middleware.Context, next middleware.Next) {
-		w := c[sola.Response].(http.ResponseWriter) // 获取 ResponseWriter 对象
-		w.Write([]byte("Hello World"))              // 输出 Hello World
+		sola.Text(c, "Hello World") // 输出 Hello World
 	})
 
 	// 监听
@@ -35,6 +30,27 @@ func main() {
 ```
 
 TODO: 框架开发中，更多 demo 请参考 test 目录
+
+## About Writer
+
+Writer 可简化 Response 的书写：
+
+```go
+// Text Writer
+sola.Text(c, "Hello World")
+
+// JSON Writer
+sola.JSON(c, &MyResponse{
+	Code: 0,
+	Msg:  "Success",
+	Data: "Hello World!",
+})
+```
+
+### Builtin Writer
+
++ [x] Text	普通文本
++ [x] JSON	JSON 格式
 
 ## About Middleware
 
