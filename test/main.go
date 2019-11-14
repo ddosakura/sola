@@ -7,6 +7,7 @@ import (
 
 	"github.com/ddosakura/sola"
 	"github.com/ddosakura/sola/middleware"
+	"github.com/ddosakura/sola/middleware/auth"
 	"github.com/ddosakura/sola/middleware/backup"
 	"github.com/ddosakura/sola/middleware/favicon"
 	"github.com/ddosakura/sola/middleware/router"
@@ -60,11 +61,62 @@ func main() {
 		c[sola.Response].(http.ResponseWriter).Write([]byte("r2 - B"))
 	})
 
+	// 测试JWT认证和嵌套路由
+	sign := auth.Sign(auth.AuthJWT, []byte("sola_key"))
+	AUTH := auth.Auth(auth.AuthJWT, []byte("sola_key"))
+	r3 := router.New()
+	r31 := router.New()
+	r31.Prefix = "/sub"
+	r31.Bind("/sub/a", func(c middleware.Context, next middleware.Next) {
+		fmt.Println("r31 - 1")
+		c[sola.Response].(http.ResponseWriter).Write([]byte("r31 - 1"))
+	})
+	r31.Bind("/b", func(c middleware.Context, next middleware.Next) {
+		fmt.Println("r31 - 2")
+		c[sola.Response].(http.ResponseWriter).Write([]byte("r31 - 2"))
+	})
+	r32 := router.New()
+	r32.Prefix = "/sub"
+	r32.Bind("/d/:id", func(c middleware.Context, next middleware.Next) {
+		claims := c["auth.claims"].(map[string]interface{})
+		// fmt.Println(claims)
+		id := c["router.param.id"].(string)
+		c[sola.Response].(http.ResponseWriter).Write([]byte("No. " + id + "\nUser: " + claims["user"].(string)))
+	})
+	r3.Bind("/sub", auth.New(AUTH, nil, middleware.Merge(r31.Routes(), r32.Routes())))
+	r3.Bind("/login", auth.New(sign, func(c middleware.Context, next middleware.Next) {
+		r := c[sola.Request].(*http.Request)
+		q := r.URL.Query()
+		user := q["user"]
+		pass := q["pass"]
+		if len(user) == 0 || len(pass) == 0 || pass[0] != "123456" {
+			c[sola.Response].(http.ResponseWriter).Write([]byte("login fail"))
+			return
+		}
+		c["auth.claims"] = map[string]interface{}{
+			"issuer": "sola",
+			"user":   user[0],
+		}
+		next()
+	}, func(c middleware.Context, next middleware.Next) {
+		c[sola.Response].(http.ResponseWriter).Write([]byte("login success"))
+	}))
+	r3.Bind("/logout", auth.Clean(func(c middleware.Context, next middleware.Next) {
+		c[sola.Response].(http.ResponseWriter).Write([]byte("logout"))
+	}))
+
+	// 测试Base认证
+	base := auth.Auth(auth.AuthBase, auth.BaseCheck(func(u, p string) bool {
+		return u == "admin" && p == "123456"
+	}))
+	r3.Bind("/base", auth.New(base, nil, hw))
+
 	// 测试 Favicon
 	app := sola.New()
-	app.Use(favicon.Favicon("http://fanyi.bdstatic.com/static/translation/img/favicon/favicon-32x32_ca689c3.png"))
+	app.Use(favicon.New("http://fanyi.bdstatic.com/static/translation/img/favicon/favicon-32x32_ca689c3.png"))
 	app.Use(r.Routes())
 	app.Use(r2.Routes())
+	app.Use(r3.Routes())
 
 	// 测试 Backup
 	sola.Listen("127.0.0.1:3000", app)

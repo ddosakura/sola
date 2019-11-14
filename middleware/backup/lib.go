@@ -7,8 +7,8 @@ import (
 	"github.com/ddosakura/sola/middleware"
 )
 
-// Backup Middleware Builder
-func Backup(addr string) middleware.Middleware {
+// New Backup Middleware
+func New(addr string) middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
 		r := c[sola.Request].(*http.Request)
 		w := c[sola.Response].(http.ResponseWriter)
@@ -20,6 +20,6 @@ func Backup(addr string) middleware.Middleware {
 // App Backup
 func App(addr string) *sola.Group {
 	app := sola.New()
-	app.Use(Backup(addr))
+	app.Use(New(addr))
 	return app
 }

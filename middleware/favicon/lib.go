@@ -7,8 +7,8 @@ import (
 	"github.com/ddosakura/sola/middleware"
 )
 
-// Favicon Middleware Builder
-func Favicon(url string) middleware.Middleware {
+// New Favicon Middleware
+func New(url string) middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
 		r := c[sola.Request].(*http.Request)
 		w := c[sola.Response].(http.ResponseWriter)

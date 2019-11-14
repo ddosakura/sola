@@ -50,7 +50,7 @@ func (r *Router) Routes() middleware.Middleware {
 				continue
 			}
 
-			URL := req.URL.String()
+			URL := req.URL.EscapedPath()
 			if !strings.HasPrefix(URL, r.Prefix) {
 				continue
 			}

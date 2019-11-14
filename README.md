@@ -19,8 +19,8 @@ import (
 
 func main() {
 	// Sola
-	app := sola.New()                                                                                              // 创建 Sola App
-	app.Use(favicon.Favicon("http://fanyi.bdstatic.com/static/translation/img/favicon/favicon-32x32_ca689c3.png")) // 设置 Favicon
+	app := sola.New()                                                                                          // 创建 Sola App
+	app.Use(favicon.New("http://fanyi.bdstatic.com/static/translation/img/favicon/favicon-32x32_ca689c3.png")) // 设置 Favicon
 
 	// 核心部分
 	app.Use(func(c middleware.Context, next middleware.Next) {
@@ -59,7 +59,7 @@ type Middleware func(Context, Next)
 
 ### Builtin Middleware
 
-+ [ ] auth      认证中间件
++ [x] auth      认证中间件
 + [x] backup    301 to other host - e.g. http -> https
 + [x] favicon   301 to Online Favicon
 + [x] router    路由中间件
