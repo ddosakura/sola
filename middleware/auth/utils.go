@@ -23,3 +23,8 @@ func basicAuth(username, password string) string {
 	auth := username + ":" + password
 	return base64.StdEncoding.EncodeToString([]byte(auth))
 }
+
+// Claims Reader
+func Claims(c middleware.Context, key string) interface{} {
+	return c[CtxClaims].(map[string]interface{})[key]
+}

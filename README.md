@@ -94,4 +94,4 @@ type Middleware func(Context, Next)
 
 ## About ORM
 
-+ [ ] orm
++ [x] orm		see gorm

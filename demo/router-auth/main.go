@@ -19,7 +19,7 @@ func main() {
 	sub := router.New()
 	sub.Prefix = "/user" // 路由前缀
 	sub.Bind("/:id", func(c middleware.Context, next middleware.Next) {
-		id := router.Param(c, "id").(string) // 路径参数
+		id := router.Param(c, "id") // 路径参数
 
 		// 获取用户名
 		claims := c[auth.CtxClaims].(map[string]interface{})

@@ -24,6 +24,6 @@ func CtxParam(key string) string {
 }
 
 // Param in route
-func Param(c middleware.Context, key string) interface{} {
-	return c[CtxParam(key)]
+func Param(c middleware.Context, key string) string {
+	return c[CtxParam(key)].(string)
 }
