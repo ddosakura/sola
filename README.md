@@ -35,6 +35,7 @@ func main() {
 + [favicon、static、backup](blob/master/demo/favicon-static-backup/main.go)
 + [Hello World](blob/master/demo/hello-world/main.go)
 + [路由&认证 (router、auth)](blob/master/demo/router-auth/main.go)
++ [完整的注册、登录、鉴权例子](blob/master/demo/simple-app)
 
 ## About Writer
 
