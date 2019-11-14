@@ -63,6 +63,7 @@ type Middleware func(Context, Next)
 + [x] backup    301 to other host - e.g. http -> https
 + [x] favicon   301 to Online Favicon
 + [x] router    路由中间件
++ [x] static    静态文件中间件
 
 ## About ORM
 

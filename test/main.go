@@ -11,6 +11,7 @@ import (
 	"github.com/ddosakura/sola/middleware/backup"
 	"github.com/ddosakura/sola/middleware/favicon"
 	"github.com/ddosakura/sola/middleware/router"
+	"github.com/ddosakura/sola/middleware/static"
 )
 
 func hw(c middleware.Context, next middleware.Next) {
@@ -117,6 +118,9 @@ func main() {
 	app.Use(r.Routes())
 	app.Use(r2.Routes())
 	app.Use(r3.Routes())
+
+	// 测试静态文件
+	app.Use(static.New("static"))
 
 	// 测试 Backup
 	sola.Listen("127.0.0.1:3000", app)
