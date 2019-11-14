@@ -29,7 +29,12 @@ func main() {
 }
 ```
 
-TODO: 框架开发中，更多 demo 请参考 test 目录
+### Demo
+
++ [Base Auth](blob/master/demo/base-auth/main.go)
++ [favicon、static、backup](blob/master/demo/favicon-static-backup/main.go)
++ [Hello World](blob/master/demo/hello-world/main.go)
++ [路由&认证 (router、auth)](blob/master/demo/router-auth/main.go)
 
 ## About Writer
 
