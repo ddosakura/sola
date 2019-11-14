@@ -1,4 +1,4 @@
-# sola
+# Sola
 
 A simple golang web framwork based middleware.
 
@@ -29,7 +29,7 @@ func main() {
 }
 ```
 
-### Demo
+### More Demo
 
 + [Base Auth](blob/master/demo/base-auth/main.go)
 + [favicon、static、backup](blob/master/demo/favicon-static-backup/main.go)
@@ -77,6 +77,10 @@ type Middleware func(Context, Next)
 + sola      框架
 + router    路由中间件
     + router.param.*    路径参数
++ auth		认证中间件
+	+ auth.username		Base Auth 用户名
+	+ auth.password		Base Auth 密码
+	+ auth.claims		JWT Auth Payload
 
 ### Builtin Middleware
 
