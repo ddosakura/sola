@@ -45,7 +45,7 @@ func signBase(c middleware.Context, next middleware.Next) {
 	username, ok1 := c[CtxUsername].(string)
 	password, ok2 := c[CtxPassword].(string)
 	if !ok1 || !ok2 {
-		w.WriteHeader(http.StatusInternalServerError)
+		sola.Text(c, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 	http.SetCookie(w, &http.Cookie{
@@ -60,7 +60,7 @@ func signJWT(key interface{}) middleware.Middleware {
 		w := c[sola.Response].(http.ResponseWriter)
 		tmp := c[CtxClaims]
 		if tmp == nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			sola.Text(c, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		claims := tmp.(map[string]interface{})
@@ -68,7 +68,7 @@ func signJWT(key interface{}) middleware.Middleware {
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, tmp2)
 		t, err := token.SignedString(key)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			sola.Text(c, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 		http.SetCookie(w, &http.Cookie{
