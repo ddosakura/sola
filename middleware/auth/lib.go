@@ -41,14 +41,13 @@ func Sign(t Type, key interface{}) middleware.Middleware {
 
 func signBase(c middleware.Context, next middleware.Next) {
 	// 可取代浏览器默认弹窗的方式
-	w := c[sola.Response].(http.ResponseWriter)
 	username, ok1 := c[CtxUsername].(string)
 	password, ok2 := c[CtxPassword].(string)
 	if !ok1 || !ok2 {
 		sola.Text(c, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	http.SetCookie(w, &http.Cookie{
+	sola.SetCookie(c, &http.Cookie{
 		Name:  authCookieCacheKey,
 		Value: "Basic " + basicAuth(username, password),
 	})
@@ -57,7 +56,6 @@ func signBase(c middleware.Context, next middleware.Next) {
 
 func signJWT(key interface{}) middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
-		w := c[sola.Response].(http.ResponseWriter)
 		tmp := c[CtxClaims]
 		if tmp == nil {
 			sola.Text(c, "Internal Server Error", http.StatusInternalServerError)
@@ -71,7 +69,7 @@ func signJWT(key interface{}) middleware.Middleware {
 			sola.Text(c, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		http.SetCookie(w, &http.Cookie{
+		sola.SetCookie(c, &http.Cookie{
 			Name:  authCookieCacheKey,
 			Value: jwtAuthPrefix + t,
 		})
