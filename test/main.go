@@ -38,21 +38,22 @@ func main() {
 	})
 
 	// 测试 Merge
+	const TMP = "custom.tmp"
 	b1 := func(c middleware.Context, next middleware.Next) {
 		fmt.Println("B")
 		next()
 	}
 	b2 := func(c middleware.Context, next middleware.Next) {
 		next()
-		c[sola.Response].(http.ResponseWriter).Write(c["tmp"].([]byte))
+		c[sola.Response].(http.ResponseWriter).Write(c[TMP].([]byte))
 	}
 	b3 := func(c middleware.Context, next middleware.Next) {
-		id, e := strconv.Atoi(c["router.param.id"].(string))
+		id, e := strconv.Atoi(router.Param(c, "id").(string))
 		if e != nil {
 			id = -1
 		}
 		tmp := []byte("UID*2 = " + strconv.Itoa(id*2))
-		c["tmp"] = tmp
+		c[TMP] = tmp
 	}
 	r.Bind("/b/:id", middleware.Merge(b1, b2, b3))
 
@@ -79,9 +80,8 @@ func main() {
 	r32 := router.New()
 	r32.Prefix = "/sub"
 	r32.Bind("/d/:id", func(c middleware.Context, next middleware.Next) {
-		claims := c["auth.claims"].(map[string]interface{})
-		// fmt.Println(claims)
-		id := c["router.param.id"].(string)
+		claims := c[auth.CtxClaims].(map[string]interface{})
+		id := router.Param(c, "id").(string)
 		c[sola.Response].(http.ResponseWriter).Write([]byte("No. " + id + "\nUser: " + claims["user"].(string)))
 	})
 	r3.Bind("/sub", auth.New(AUTH, nil, middleware.Merge(r31.Routes(), r32.Routes())))
@@ -94,7 +94,7 @@ func main() {
 			c[sola.Response].(http.ResponseWriter).Write([]byte("login fail"))
 			return
 		}
-		c["auth.claims"] = map[string]interface{}{
+		c[auth.CtxClaims] = map[string]interface{}{
 			"issuer": "sola",
 			"user":   user[0],
 		}
