@@ -129,8 +129,8 @@ func main() {
 
 	// 测试静态文件
 	r4 := router.New()
-	r4.Prefix = "/static"
-	r4.Bind("/", static.New("static"))
+	r4.Prefix = "/file"
+	r4.Bind("", static.New("static", "/file"))
 	app.Use(r4.Routes())
 
 	// 测试 Backup
