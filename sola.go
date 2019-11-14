@@ -26,8 +26,8 @@ func (g *Group) Use(m middleware.Middleware) {
 // ServeHTTP to impl http handler
 func (g *Group) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	c := middleware.Context{}
-	c[Request] = r
-	c[Response] = w
+	c[CtxRequest] = r
+	c[CtxResponse] = w
 
 	middleware.Merge(g.middlewares...)(c, nil)
 }

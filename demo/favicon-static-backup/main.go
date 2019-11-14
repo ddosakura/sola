@@ -24,8 +24,8 @@ func main() {
 
 	sola.Listen("127.0.0.1:3000", app)
 
-	// 自动跳转 127.0.0.1:3000
-	bak := backup.App("127.0.0.1:3000")
+	// 自动跳转 http://127.0.0.1:3000
+	bak := backup.App("http://127.0.0.1:3000")
 	sola.Listen("127.0.0.1:3001", bak)
 
 	sola.Keep()

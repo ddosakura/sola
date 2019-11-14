@@ -10,10 +10,9 @@ import (
 // New Backup Middleware
 func New(addr string) middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
-		r := c[sola.Request].(*http.Request)
-		w := c[sola.Response].(http.ResponseWriter)
-		w.Header().Add("Location", addr+r.URL.String())
-		w.WriteHeader(http.StatusMovedPermanently)
+		r := sola.GetRequest(c)
+		sola.ResponseHeader(c).Add("Location", addr+r.URL.String())
+		sola.GetResponse(c).WriteHeader(http.StatusMovedPermanently)
 	}
 }
 

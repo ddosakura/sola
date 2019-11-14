@@ -2,7 +2,6 @@ package sola
 
 import (
 	"encoding/json"
-	"net/http"
 
 	"github.com/ddosakura/sola/middleware"
 )
@@ -13,7 +12,7 @@ func JSON(c middleware.Context, data interface{}, statusCode ...int) (int, error
 	if err != nil {
 		return 0, err
 	}
-	w := c[Response].(http.ResponseWriter)
+	w := GetResponse(c)
 	ResponseHeader(c).Set("Content-Type", "application/json; charset=utf-8")
 	if len(statusCode) > 0 {
 		w.WriteHeader(statusCode[0])
@@ -23,7 +22,7 @@ func JSON(c middleware.Context, data interface{}, statusCode ...int) (int, error
 
 // Text Writer
 func Text(c middleware.Context, data string, statusCode ...int) (int, error) {
-	w := c[Response].(http.ResponseWriter)
+	w := GetResponse(c)
 	if len(statusCode) > 0 {
 		w.WriteHeader(statusCode[0])
 	}

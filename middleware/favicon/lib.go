@@ -10,12 +10,14 @@ import (
 // New Favicon Middleware
 func New(url string) middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
-		r := c[sola.Request].(*http.Request)
-		w := c[sola.Response].(http.ResponseWriter)
+		r := sola.GetRequest(c)
 		if r.URL.String() == "/favicon.ico" {
-			w.Header().Add("Location", url)
-			w.WriteHeader(http.StatusMovedPermanently)
-		} else if next != nil {
+			sola.ResponseHeader(c).Add("Location", url)
+			sola.GetResponse(c).WriteHeader(http.StatusMovedPermanently)
+			return
+		}
+
+		if next != nil {
 			next()
 		}
 	}

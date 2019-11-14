@@ -10,8 +10,8 @@ import (
 // New Static Middleware
 func New(path, prefix string) middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
-		r := c[sola.Request].(*http.Request)
-		w := c[sola.Response].(http.ResponseWriter)
+		r := sola.GetRequest(c)
+		w := sola.GetResponse(c)
 		http.StripPrefix(prefix, http.FileServer(http.Dir(path))).ServeHTTP(w, r)
 	}
 }

@@ -8,17 +8,20 @@ import (
 
 // SetCookie proxy http.SetCookie
 func SetCookie(c middleware.Context, cookie *http.Cookie) {
-	w := c[Response].(http.ResponseWriter)
-	http.SetCookie(w, cookie)
+	http.SetCookie(GetResponse(c), cookie)
 }
 
 // ResponseHeader proxy w.Header()
 func ResponseHeader(c middleware.Context) http.Header {
-	w := c[Response].(http.ResponseWriter)
-	return w.Header()
+	return GetResponse(c).Header()
 }
 
 // GetRequest from context
 func GetRequest(c middleware.Context) *http.Request {
-	return c[Request].(*http.Request)
+	return c[CtxRequest].(*http.Request)
+}
+
+// GetResponse from context
+func GetResponse(c middleware.Context) http.ResponseWriter {
+	return c[CtxResponse].(http.ResponseWriter)
 }

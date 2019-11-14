@@ -7,8 +7,8 @@ import (
 
 // ContextKey
 var (
-	Request  = "sola.request"
-	Response = "sola.response"
+	CtxRequest  = "sola.request"
+	CtxResponse = "sola.response"
 )
 
 var wg sync.WaitGroup

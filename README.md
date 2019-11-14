@@ -75,6 +75,8 @@ type Middleware func(Context, Next)
 关于 Context 键值的约定：
 
 + sola      框架
+	+ sola.request		*http.Request
+	+ sola.response		http.ResponseWriter
 + router    路由中间件
     + router.param.*    路径参数
 + auth		认证中间件
