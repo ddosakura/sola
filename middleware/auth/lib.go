@@ -16,11 +16,11 @@ func New(signOrAuth middleware.Middleware, pre middleware.Middleware, success mi
 	}
 	if success == nil {
 		success = func(c middleware.Context, next middleware.Next) {
-			c[sola.Response].(http.ResponseWriter).Write([]byte("auth success"))
+			sola.Text(c, "auth success")
 		}
 	}
 	return middleware.Merge(func(c middleware.Context, next middleware.Next) {
-		r := c[sola.Request].(*http.Request)
+		r := sola.GetRequest(c)
 		cache, err := r.Cookie(authCookieCacheKey)
 		tmp := r.Header.Get("Authorization")
 		if tmp == "" && err == nil {
@@ -92,12 +92,11 @@ func Auth(t Type, key interface{}) middleware.Middleware {
 
 func authBase(check BaseCheck) middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
-		r := c[sola.Request].(*http.Request)
-		w := c[sola.Response].(http.ResponseWriter)
+		r := sola.GetRequest(c)
 		username, password, ok := r.BasicAuth()
 		if !ok {
 			// TODO: custom
-			w.Header().Add("WWW-Authenticate", "Basic realm=\"sola\"")
+			sola.ResponseHeader(c).Add("WWW-Authenticate", "Basic realm=\"sola\"")
 			sola.Text(c, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -112,14 +111,13 @@ func authBase(check BaseCheck) middleware.Middleware {
 
 func authJWT(key interface{}) middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
-		r := c[sola.Request].(*http.Request)
-		w := c[sola.Response].(http.ResponseWriter)
+		r := sola.GetRequest(c)
 
 		auth := r.Header.Get("Authorization")
 		tokenString, ok := parseBearerAuth(auth)
 		if !ok {
 			// TODO: custom
-			w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
+			sola.ResponseHeader(c).Add("WWW-Authenticate", jwtAuthPrefix)
 			sola.Text(c, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -134,7 +132,7 @@ func authJWT(key interface{}) middleware.Middleware {
 
 		if token == nil {
 			// TODO: custom
-			w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
+			sola.ResponseHeader(c).Add("WWW-Authenticate", jwtAuthPrefix)
 			sola.Text(c, "Unauthorized", http.StatusUnauthorized)
 			return
 		}

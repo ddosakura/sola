@@ -15,7 +15,7 @@ func example1() {
 	app := sola.New()
 
 	app.Use(func(c middleware.Context, next middleware.Next) {
-		r := c[sola.Request].(*http.Request)
+		r := sola.GetRequest(c)
 		if r.URL.String() != "/favicon.ico" {
 			next()
 			s := c[key].(string)

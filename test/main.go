@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"strconv"
 
 	"github.com/ddosakura/sola"
@@ -25,15 +24,15 @@ func main() {
 	// 测试路由匹配
 	r.Bind("127.0.0.1:3001/a", func(c middleware.Context, next middleware.Next) {
 		fmt.Println("A1")
-		c[sola.Response].(http.ResponseWriter).Write([]byte("A1"))
+		sola.Text(c, "A1")
 	})
 	r.Bind("POST /a", func(c middleware.Context, next middleware.Next) {
 		fmt.Println("A2")
-		c[sola.Response].(http.ResponseWriter).Write([]byte("A2"))
+		sola.Text(c, "A2")
 	})
 	r.Bind("/a", func(c middleware.Context, next middleware.Next) {
 		fmt.Println("A3")
-		c[sola.Response].(http.ResponseWriter).Write([]byte("A3"))
+		sola.Text(c, "A3")
 	})
 
 	// 测试 Merge
@@ -44,14 +43,14 @@ func main() {
 	}
 	b2 := func(c middleware.Context, next middleware.Next) {
 		next()
-		c[sola.Response].(http.ResponseWriter).Write(c[TMP].([]byte))
+		sola.Text(c, c[TMP].(string))
 	}
 	b3 := func(c middleware.Context, next middleware.Next) {
 		id, e := strconv.Atoi(router.Param(c, "id").(string))
 		if e != nil {
 			id = -1
 		}
-		tmp := []byte("UID*2 = " + strconv.Itoa(id*2))
+		tmp := "UID*2 = " + strconv.Itoa(id*2)
 		c[TMP] = tmp
 	}
 	r.Bind("/b/:id", middleware.Merge(b1, b2, b3))
@@ -59,7 +58,7 @@ func main() {
 	r2 := router.New()
 	r2.Bind("/b", func(c middleware.Context, next middleware.Next) {
 		fmt.Println("r2 - B")
-		c[sola.Response].(http.ResponseWriter).Write([]byte("r2 - B"))
+		sola.Text(c, "r2 - B")
 	})
 
 	// 测试JWT认证和嵌套路由
@@ -70,27 +69,27 @@ func main() {
 	r31.Prefix = "/sub"
 	r31.Bind("/sub/a", func(c middleware.Context, next middleware.Next) {
 		fmt.Println("r31 - 1")
-		c[sola.Response].(http.ResponseWriter).Write([]byte("r31 - 1"))
+		sola.Text(c, "r31 - 1")
 	})
 	r31.Bind("/b", func(c middleware.Context, next middleware.Next) {
 		fmt.Println("r31 - 2")
-		c[sola.Response].(http.ResponseWriter).Write([]byte("r31 - 2"))
+		sola.Text(c, "r31 - 2")
 	})
 	r32 := router.New()
 	r32.Prefix = "/sub"
 	r32.Bind("/d/:id", func(c middleware.Context, next middleware.Next) {
 		claims := c[auth.CtxClaims].(map[string]interface{})
 		id := router.Param(c, "id").(string)
-		c[sola.Response].(http.ResponseWriter).Write([]byte("No. " + id + "\nUser: " + claims["user"].(string)))
+		sola.Text(c, "No. "+id+"\nUser: "+claims["user"].(string))
 	})
 	r3.Bind("/sub", auth.New(AUTH, nil, middleware.Merge(r31.Routes(), r32.Routes())))
 	r3.Bind("/login", auth.New(sign, func(c middleware.Context, next middleware.Next) {
-		r := c[sola.Request].(*http.Request)
+		r := sola.GetRequest(c)
 		q := r.URL.Query()
 		user := q["user"]
 		pass := q["pass"]
 		if len(user) == 0 || len(pass) == 0 || pass[0] != "123456" {
-			c[sola.Response].(http.ResponseWriter).Write([]byte("login fail"))
+			sola.Text(c, "login fail")
 			return
 		}
 		c[auth.CtxClaims] = map[string]interface{}{
@@ -99,10 +98,10 @@ func main() {
 		}
 		next()
 	}, func(c middleware.Context, next middleware.Next) {
-		c[sola.Response].(http.ResponseWriter).Write([]byte("login success"))
+		sola.Text(c, "login success")
 	}))
 	r3.Bind("/logout", auth.Clean(func(c middleware.Context, next middleware.Next) {
-		c[sola.Response].(http.ResponseWriter).Write([]byte("logout"))
+		sola.Text(c, "logout")
 	}))
 
 	// 测试Base认证

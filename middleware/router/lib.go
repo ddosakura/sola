@@ -39,7 +39,7 @@ func (r *Router) Bind(match string, m middleware.Middleware) {
 // Routes gen Middleware
 func (r *Router) Routes() middleware.Middleware {
 	return func(c middleware.Context, next middleware.Next) {
-		req := c[sola.Request].(*http.Request)
+		req := sola.GetRequest(c)
 	Match:
 		for _, meta := range r.routes {
 			if meta.method != "" && meta.method != req.Method {

@@ -14,7 +14,7 @@ func JSON(c middleware.Context, data interface{}, statusCode ...int) (int, error
 		return 0, err
 	}
 	w := c[Response].(http.ResponseWriter)
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	ResponseHeader(c).Set("Content-Type", "application/json; charset=utf-8")
 	if len(statusCode) > 0 {
 		w.WriteHeader(statusCode[0])
 	}
