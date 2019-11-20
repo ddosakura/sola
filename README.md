@@ -89,7 +89,7 @@ type (
 
 ### Builtin Middleware
 
-+ [x] auth      认证中间件
++ [ ] auth      认证中间件
 	+ [x] 简化改造
 	+ [ ] 自定义返回内容
 + [x] backup    301 to other host - e.g. http -> https
@@ -101,3 +101,8 @@ type (
 ## About ORM
 
 + [x] orm		see gorm (可选依赖)
+
+## About Config
+
++ [ ] dev/prod
++ [ ] read config
