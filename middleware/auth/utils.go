@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"github.com/ddosakura/sola/middleware"
+	"github.com/ddosakura/sola/v2"
 )
 
 func parseBearerAuth(auth string) (token string, ok bool) {
@@ -14,8 +14,10 @@ func parseBearerAuth(auth string) (token string, ok bool) {
 	return auth[len(jwtAuthPrefix):], true
 }
 
-func nextFn(c middleware.Context, next middleware.Next) {
-	next()
+func nextFn(next sola.Handler) sola.Handler {
+	return func(c sola.Context) error {
+		return next(c)
+	}
 }
 
 // fork from http pkg
@@ -25,6 +27,6 @@ func basicAuth(username, password string) string {
 }
 
 // Claims Reader
-func Claims(c middleware.Context, key string) interface{} {
+func Claims(c sola.Context, key string) interface{} {
 	return c[CtxClaims].(map[string]interface{})[key]
 }

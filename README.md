@@ -1,4 +1,4 @@
-# Sola
+# Sola V2
 
 A simple golang web framwork based middleware.
 
@@ -10,8 +10,9 @@ A simple golang web framwork based middleware.
 package main
 
 import (
-	"github.com/ddosakura/sola"
-	"github.com/ddosakura/sola/middleware"
+	"net/http"
+
+	"github.com/ddosakura/sola/v2"
 )
 
 func main() {
@@ -19,8 +20,11 @@ func main() {
 	app := sola.New() // 创建 Sola App
 
 	// 核心部分
-	app.Use(func(c middleware.Context, next middleware.Next) {
-		sola.Text(c, "Hello World") // 输出 Hello World
+	app.Use(func(next sola.Handler) sola.Handler {
+		return func(c sola.Context) error {
+			// 输出 Hello World
+			return c.String(http.StatusOK, "Hello World")
+		}
 	})
 
 	// 监听
@@ -31,22 +35,23 @@ func main() {
 
 ### More Demo
 
-+ [Base Auth](demo/base-auth/main.go)
-+ [favicon、static、backup](demo/favicon-static-backup/main.go)
-+ [Hello World](demo/hello-world/main.go)
-+ [路由&认证 (router、auth)](demo/router-auth/main.go)
-+ [完整的注册、登录、鉴权例子](demo/simple-app)
++ [x] [Base Auth](demo/base-auth/main.go)
++ [x] [favicon、static、backup](demo/favicon-static-backup/main.go)
++ [x] [Hello World](demo/hello-world/main.go)
++ [x] [中间件执行顺序](demo/middleware/main.go)
++ [x] [路由&认证 (router、auth)](demo/router-auth/main.go)
++ [x] [完整的注册、登录、鉴权例子](demo/simple-app)
 
 ## About Writer
 
 Writer 可简化 Response 的书写：
 
 ```go
-// Text Writer
-sola.Text(c, "Hello World")
+// String Writer
+c.String(http.StatusOK, "Hello World")
 
 // JSON Writer
-sola.JSON(c, &MyResponse{
+c.JSON(http.StatusOK, &MyResponse{
 	Code: 0,
 	Msg:  "Success",
 	Data: "Hello World!",
@@ -55,22 +60,24 @@ sola.JSON(c, &MyResponse{
 
 ### Builtin Writer
 
-+ [x] Text	普通文本
-+ [x] JSON	JSON 格式
++ [x] String	普通文本
++ [x] JSON		JSON 格式
 
 ## About Middleware
 
 中间间的定义如下：
 
 ```go
-// Context for Middleware
-type Context map[string]interface{}
+type (
+	// Context for Middleware
+	Context map[string]interface{}
 
-// Next func
-type Next func()
+	// Handler func
+	Handler func(Context) error
 
-// Middleware func
-type Middleware func(Context, Next)
+	// Middleware func
+	Middleware func(Handler) Handler
+)
 ```
 
 关于 Context 键值的约定：
@@ -88,9 +95,12 @@ type Middleware func(Context, Next)
 ### Builtin Middleware
 
 + [x] auth      认证中间件
+	+ [x] 简化改造
+	+ [ ] 自定义返回内容
 + [x] backup    301 to other host - e.g. http -> https
 + [x] favicon   301 to Online Favicon
 + [x] router    路由中间件
+	+ [x] 简化改造
 + [x] static    静态文件中间件
 
 ## About ORM

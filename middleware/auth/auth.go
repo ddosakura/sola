@@ -1,5 +1,9 @@
 package auth
 
+import (
+	"errors"
+)
+
 // Type of Auth
 type Type uint8
 
@@ -24,4 +28,9 @@ const (
 	CtxUsername = "auth.username"
 	CtxPassword = "auth.password"
 	CtxClaims   = "auth.claims"
+)
+
+// error(s)
+var (
+	ErrNoClaims = errors.New("auth.claims not found")
 )

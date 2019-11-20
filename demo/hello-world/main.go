@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/ddosakura/sola"
-	"github.com/ddosakura/sola/middleware"
+	"net/http"
+
+	"github.com/ddosakura/sola/v2"
 )
 
 func main() {
@@ -10,8 +11,11 @@ func main() {
 	app := sola.New() // 创建 Sola App
 
 	// 核心部分
-	app.Use(func(c middleware.Context, next middleware.Next) {
-		sola.Text(c, "Hello World") // 输出 Hello World
+	app.Use(func(next sola.Handler) sola.Handler {
+		return func(c sola.Context) error {
+			// 输出 Hello World
+			return c.String(http.StatusOK, "Hello World")
+		}
 	})
 
 	// 监听

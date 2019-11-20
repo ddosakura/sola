@@ -1,20 +1,21 @@
 package main
 
 import (
-	"github.com/ddosakura/sola"
-	"github.com/ddosakura/sola/middleware"
+	"net/http"
+
+	"github.com/ddosakura/sola/v2"
 )
 
-func fail(c middleware.Context) {
-	sola.JSON(c, map[string]interface{}{
+var fail = sola.Handler(func(c sola.Context) error {
+	return c.JSON(http.StatusOK, map[string]interface{}{
 		"code": -1,
 		"msg":  "FAIL",
 	})
-}
+})
 
-func success(c middleware.Context, next middleware.Next) {
-	sola.JSON(c, map[string]interface{}{
+var success = sola.Handler(func(c sola.Context) error {
+	return c.JSON(http.StatusOK, map[string]interface{}{
 		"code": 0,
 		"msg":  "SUCCESS",
 	})
-}
+})

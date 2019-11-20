@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/ddosakura/sola"
-	"github.com/ddosakura/sola/middleware"
-	"github.com/ddosakura/sola/middleware/auth"
+	"net/http"
+
+	"github.com/ddosakura/sola/v2"
+	"github.com/ddosakura/sola/v2/middleware/auth"
 )
 
 // 用户名、密码验证函数
@@ -16,8 +17,12 @@ func main() {
 	app := sola.New()                       // 创建 Sola App
 	base := auth.Auth(auth.AuthBase, check) // 创建 Base Auth
 
-	app.Use(auth.New(base, nil, func(c middleware.Context, next middleware.Next) {
-		sola.Text(c, "Hello World") // 输出 Hello World
+	// 核心部分
+	app.Use(auth.New(base, nil, func(next sola.Handler) sola.Handler {
+		return func(c sola.Context) error {
+			// 输出 Hello World
+			return c.String(http.StatusOK, "Hello World")
+		}
 	}))
 
 	// 监听

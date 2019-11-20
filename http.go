@@ -5,16 +5,10 @@ import (
 	"sync"
 )
 
-// ContextKey
-var (
-	CtxRequest  = "sola.request"
-	CtxResponse = "sola.response"
-)
-
 var wg sync.WaitGroup
 
 // Listen & Serve
-func Listen(addr string, g *Group) {
+func Listen(addr string, g *Sola) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -23,7 +17,7 @@ func Listen(addr string, g *Group) {
 }
 
 // ListenTLS & Serve
-func ListenTLS(addr string, certFile string, keyFile string, g *Group) {
+func ListenTLS(addr string, certFile string, keyFile string, g *Sola) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()

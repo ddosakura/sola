@@ -3,7 +3,7 @@ package router
 import (
 	"strings"
 
-	"github.com/ddosakura/sola/middleware"
+	"github.com/ddosakura/sola/v2"
 )
 
 func parse(match string) (method string, host string, urls []string) {
@@ -24,6 +24,6 @@ func CtxParam(key string) string {
 }
 
 // Param in route
-func Param(c middleware.Context, key string) string {
+func Param(c sola.Context, key string) string {
 	return c[CtxParam(key)].(string)
 }
