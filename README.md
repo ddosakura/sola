@@ -35,12 +35,7 @@ func main() {
 
 ### More Example
 
-+ [x] [Base Auth](example/base-auth/main.go)
-+ [x] [favicon、static、backup](example/favicon-static-backup/main.go)
-+ [x] [Hello World](example/hello-world/main.go)
-+ [x] [中间件执行顺序](example/middleware/main.go)
-+ [x] [路由&认证 (router、auth)](example/router-auth/main.go)
-+ [x] [完整的注册、登录、鉴权例子](example/simple-app)
++ [Example 仓库地址](https://github.com/it-repo/box-example)
 
 ## About Writer
 
@@ -105,4 +100,4 @@ type (
 
 ## About ORM
 
-+ [x] orm		see gorm
++ [x] orm		see gorm (可选依赖)
