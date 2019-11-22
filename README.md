@@ -53,8 +53,6 @@ c.JSON(http.StatusOK, &MyResponse{
 })
 ```
 
-// TODO: 换第三方json解析
-
 ### Builtin Writer
 
 + [x] String	普通文本
@@ -103,9 +101,10 @@ type (
 
 ## About ORM
 
-+ [x] orm		see gorm (可选依赖)
++ [ ] Debug in Dev
++ see [gorm](https://github.com/jinzhu/gorm)
 
 ## About Config
 
 + [ ] dev/prod
-+ [ ] read config
++ see [viper](https://github.com/spf13/viper)
