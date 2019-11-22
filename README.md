@@ -53,6 +53,8 @@ c.JSON(http.StatusOK, &MyResponse{
 })
 ```
 
+// TODO: 换第三方json解析
+
 ### Builtin Writer
 
 + [x] String	普通文本
@@ -97,6 +99,7 @@ type (
 + [x] router    路由中间件
 	+ [x] 简化改造
 + [x] static    静态文件中间件
++ [x] cors		跨域中间件 - 参考 [koa2-cors](https://github.com/zadzbw/koa2-cors)
 
 ## About ORM
 
