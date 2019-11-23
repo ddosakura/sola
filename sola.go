@@ -17,7 +17,8 @@ type (
 	// Sola App
 	Sola struct {
 		middlewares  []Middleware
-		ErrorHandler func(error, Context)
+		handlers     map[int]Handler      // not 500
+		ErrorHandler func(error, Context) // 500
 	}
 )
 
@@ -25,6 +26,7 @@ type (
 func New() *Sola {
 	return &Sola{
 		middlewares: []Middleware{},
+		handlers:    map[int]Handler{},
 	}
 }
 
@@ -36,6 +38,7 @@ func (s *Sola) Use(m Middleware) {
 // ServeHTTP to impl http handler
 func (s *Sola) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	c := Context{}
+	c[CtxSola] = s
 	c[CtxRequest] = r
 	c[CtxResponse] = w
 

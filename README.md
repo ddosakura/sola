@@ -91,20 +91,21 @@ type (
 
 + [ ] auth      认证中间件
 	+ [x] 简化改造
-	+ [ ] 自定义返回内容
+	+ [ ] 自定义返回内容 (& Dev Mode)
 + [x] backup    301 to other host - e.g. http -> https
 + [x] favicon   301 to Online Favicon
 + [x] router    路由中间件
 	+ [x] 简化改造
 + [x] static    静态文件中间件
+	+ [ ] afero? statik?
 + [x] cors		跨域中间件 - 参考 [koa2-cors](https://github.com/zadzbw/koa2-cors)
-
-## About ORM
-
-+ [ ] Debug in Dev
-+ see [gorm](https://github.com/jinzhu/gorm)
 
 ## About Config
 
-+ [ ] dev/prod
++ [ ] Dev/Prod Mode
 + see [viper](https://github.com/spf13/viper)
+
+## About ORM
+
++ [ ] Debug in Dev Mode
++ see [gorm](https://github.com/jinzhu/gorm)

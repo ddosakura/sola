@@ -85,7 +85,7 @@ func (r *Router) Routes() sola.Middleware {
 				return meta.h(c)
 			}
 			if next == nil {
-				return c.String(http.StatusNotFound, "Not Found")
+				return c.Handle(http.StatusNotFound)(c)
 			}
 			return next(c)
 		}

@@ -5,6 +5,11 @@ import (
 	"net/http"
 )
 
+// Sola Impl
+func (c Context) Sola() *Sola {
+	return c[CtxSola].(*Sola)
+}
+
 // SetCookie proxy http.SetCookie
 func (c Context) SetCookie(cookie *http.Cookie) {
 	http.SetCookie(c.Response(), cookie)

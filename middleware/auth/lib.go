@@ -8,17 +8,21 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+func defaultSuccessFunc(c sola.Context) error {
+	return c.String(http.StatusOK, "auth success")
+}
+
+func defaultSuccess(next sola.Handler) sola.Handler {
+	return defaultSuccessFunc
+}
+
 // New Auth Middleware
 func New(signOrAuth sola.Middleware, pre sola.Middleware, success sola.Middleware) sola.Middleware {
 	if pre == nil {
 		pre = nextFn
 	}
 	if success == nil {
-		success = func(next sola.Handler) sola.Handler {
-			return func(c sola.Context) error {
-				return c.String(http.StatusOK, "auth success")
-			}
-		}
+		success = defaultSuccess
 	}
 	return sola.Merge(func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
@@ -39,9 +43,7 @@ func NewFunc(signOrAuth sola.Middleware, pre sola.Middleware, success sola.Handl
 		pre = nextFn
 	}
 	if success == nil {
-		success = func(c sola.Context) error {
-			return c.String(http.StatusOK, "auth success")
-		}
+		success = defaultSuccessFunc
 	}
 	return sola.MergeFunc(success, func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
@@ -71,7 +73,7 @@ func signBase(next sola.Handler) sola.Handler {
 		username, ok1 := c[CtxUsername].(string)
 		password, ok2 := c[CtxPassword].(string)
 		if !ok1 || !ok2 {
-			return c.String(http.StatusBadRequest, "Bad Request")
+			return c.Handle(http.StatusBadRequest)(c)
 		}
 		c.SetCookie(&http.Cookie{
 			Name:  authCookieCacheKey,
@@ -124,15 +126,13 @@ func authBase(check BaseCheck) sola.Middleware {
 			w := c.Response()
 			username, password, ok := r.BasicAuth()
 			if !ok {
-				// TODO: custom
 				w.Header().Add("WWW-Authenticate", "Basic realm=\"sola\"")
-				return c.String(http.StatusUnauthorized, "Unauthorized")
+				return c.Handle(http.StatusUnauthorized)(c)
 			}
 			if check(username, password) {
 				return next(c)
 			}
-			// TODO: custom
-			return c.String(http.StatusForbidden, "Forbidden")
+			return c.Handle(http.StatusForbidden)(c)
 		}
 	}
 }
@@ -146,9 +146,8 @@ func authJWT(key interface{}) sola.Middleware {
 			auth := r.Header.Get("Authorization")
 			tokenString, ok := parseBearerAuth(auth)
 			if !ok {
-				// TODO: custom
 				w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
-				return c.String(http.StatusUnauthorized, "Unauthorized")
+				return c.Handle(http.StatusUnauthorized)(c)
 			}
 
 			token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -160,17 +159,15 @@ func authJWT(key interface{}) sola.Middleware {
 			})
 
 			if token == nil {
-				// TODO: custom
 				w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
-				return c.String(http.StatusUnauthorized, "Unauthorized")
+				return c.Handle(http.StatusUnauthorized)(c)
 			}
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				var tmp map[string]interface{} = claims
 				c[CtxClaims] = tmp
 				return next(c)
 			}
-			// TODO: custom
-			return c.String(http.StatusForbidden, "Forbidden")
+			return c.Handle(http.StatusForbidden)(c)
 		}
 	}
 }

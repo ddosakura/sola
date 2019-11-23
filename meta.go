@@ -7,6 +7,7 @@ const (
 
 // ContextKey
 const (
+	CtxSola     = "sola"
 	CtxRequest  = "sola.request"
 	CtxResponse = "sola.response"
 )

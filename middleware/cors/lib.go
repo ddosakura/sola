@@ -69,7 +69,7 @@ func New(o *Option) sola.Middleware {
 					h.Set("Access-Control-Allow-Headers", tmp)
 				}
 
-				return c.String(http.StatusNoContent, "")
+				return c.Handle(http.StatusNoContent)(c)
 			}
 
 			if o.Credentials {
