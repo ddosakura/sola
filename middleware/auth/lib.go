@@ -17,7 +17,7 @@ func defaultSuccess(next sola.Handler) sola.Handler {
 }
 
 // New Auth Middleware
-func New(signOrAuth sola.Middleware, pre sola.Middleware, success sola.Middleware) sola.Middleware {
+func New(signAuth, pre, success sola.Middleware) sola.Middleware {
 	if pre == nil {
 		pre = nextFn
 	}
@@ -34,11 +34,11 @@ func New(signOrAuth sola.Middleware, pre sola.Middleware, success sola.Middlewar
 			}
 			return next(c)
 		}
-	}, pre, signOrAuth, success)
+	}, pre, signAuth, success)
 }
 
 // NewFunc Auth Handler
-func NewFunc(signOrAuth sola.Middleware, pre sola.Middleware, success sola.Handler) sola.Handler {
+func NewFunc(signAuth, pre sola.Middleware, success sola.Handler) sola.Handler {
 	if pre == nil {
 		pre = nextFn
 	}
@@ -55,7 +55,7 @@ func NewFunc(signOrAuth sola.Middleware, pre sola.Middleware, success sola.Handl
 			}
 			return next(c)
 		}
-	}, pre, signOrAuth)
+	}, pre, signAuth)
 }
 
 // Sign Token
@@ -137,6 +137,17 @@ func authBase(check BaseCheck) sola.Middleware {
 	}
 }
 
+const unexpectedSigningMethod = "Unexpected signing method: %v"
+
+func jwtParse(key interface{}, tokenStr string) (*jwt.Token, error) {
+	return jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf(unexpectedSigningMethod, token.Header["alg"])
+		}
+		return key, nil
+	})
+}
+
 func authJWT(key interface{}) sola.Middleware {
 	return func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
@@ -150,13 +161,7 @@ func authJWT(key interface{}) sola.Middleware {
 				return c.Handle(http.StatusUnauthorized)(c)
 			}
 
-			token, _ := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-				// Don't forget to validate the alg is what you expect:
-				if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-					return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
-				}
-				return key, nil
-			})
+			token, _ := jwtParse(key, tokenString)
 
 			if token == nil {
 				w.Header().Add("WWW-Authenticate", jwtAuthPrefix)

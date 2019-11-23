@@ -8,7 +8,8 @@ import (
 )
 
 func parseBearerAuth(auth string) (token string, ok bool) {
-	if len(auth) < len(jwtAuthPrefix) || !strings.EqualFold(auth[:len(jwtAuthPrefix)], jwtAuthPrefix) {
+	if len(auth) < len(jwtAuthPrefix) ||
+		!strings.EqualFold(auth[:len(jwtAuthPrefix)], jwtAuthPrefix) {
 		return
 	}
 	return auth[len(jwtAuthPrefix):], true

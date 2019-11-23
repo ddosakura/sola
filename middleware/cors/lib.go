@@ -18,6 +18,18 @@ type Option struct {
 	AllowHeaders  []string                  // Access-Control-Allow-Headers
 }
 
+var (
+	defaultAllowMethods = []string{
+		"GET",
+		"PUT",
+		"POST",
+		"PATCH",
+		"DELETE",
+		"HEAD",
+		"OPTIONS",
+	}
+)
+
 // New CORS Middleware
 // See: https://github.com/zadzbw/koa2-cors/blob/master/src/index.js
 func New(o *Option) sola.Middleware {
@@ -30,7 +42,7 @@ func New(o *Option) sola.Middleware {
 		}
 	}
 	if o.AllowMethods == nil {
-		o.AllowMethods = []string{"GET", "PUT", "POST", "PATCH", "DELETE", "HEAD", "OPTIONS"}
+		o.AllowMethods = defaultAllowMethods
 	}
 	return func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {

@@ -94,12 +94,14 @@ type (
 	+ [ ] 自定义返回内容
 		+ [ ] Dev Mode(404、500)
 + [x] cors		跨域中间件 - 参考 [koa2-cors](https://github.com/zadzbw/koa2-cors)
-+ [x] native	go 原生 handler 转换中间件
++ [x] native	go 原生 handler 转换中间件(取代原静态文件中间件)
 	+ [x] static    原静态文件中间件
 	+ 可用于静态文件
 	+ 可用于 statik
 	+ 可用于 afero
 	+ ...
++ [ ] proxy     反向代理中间件(取代原 backup、favicon 中间件)
+	+ 考虑嵌入 lua 脚本：https://github.com/yuin/gopher-lua
 + [x] router    路由中间件
 	+ [x] 简化改造
 + [x] backup    301 to other host - e.g. http -> https
