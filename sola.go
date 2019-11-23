@@ -2,6 +2,8 @@ package sola
 
 import (
 	"net/http"
+
+	"github.com/jinzhu/gorm"
 )
 
 type (
@@ -16,9 +18,18 @@ type (
 
 	// Sola App
 	Sola struct {
-		middlewares  []Middleware
+		// core
+		middlewares []Middleware
+
+		// handler
 		handlers     map[int]Handler      // not 500
 		ErrorHandler func(error, Context) // 500
+
+		// config
+		devMode bool
+
+		// orm
+		orm map[string]*gorm.DB
 	}
 )
 
@@ -27,6 +38,7 @@ func New() *Sola {
 	return &Sola{
 		middlewares: []Middleware{},
 		handlers:    map[int]Handler{},
+		orm:         map[string]*gorm.DB{},
 	}
 }
 
@@ -46,6 +58,8 @@ func (s *Sola) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := h(c); err != nil {
 		if s.ErrorHandler != nil {
 			s.ErrorHandler(err, c)
+		} else if s.devMode {
+			c.String(http.StatusInternalServerError, err.Error())
 		} else {
 			c.String(http.StatusInternalServerError, "Internal Server Error")
 		}

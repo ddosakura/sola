@@ -78,6 +78,7 @@ type (
 关于 Context 键值的约定：
 
 + sola      框架
+	+ sola				*sola.Sola
 	+ sola.request		*http.Request
 	+ sola.response		http.ResponseWriter
 + router    路由中间件
@@ -89,10 +90,9 @@ type (
 
 ### Builtin Middleware
 
-+ [ ] auth      认证中间件
-	+ [x] 简化改造
-	+ [ ] 自定义返回内容
-		+ [ ] Dev Mode(404、500)
++ [x] auth      认证中间件
+	+ [x] 自定义返回内容
+	+ [x] Dev Mode(500)
 + [x] cors		跨域中间件 - 参考 [koa2-cors](https://github.com/zadzbw/koa2-cors)
 + [x] native	go 原生 handler 转换中间件(取代原静态文件中间件)
 	+ [x] static    原静态文件中间件
@@ -103,16 +103,15 @@ type (
 + [ ] proxy     反向代理中间件(取代原 backup、favicon 中间件)
 	+ 考虑嵌入 lua 脚本：https://github.com/yuin/gopher-lua
 + [x] router    路由中间件
-	+ [x] 简化改造
 + [x] backup    301 to other host - e.g. http -> https
 + [x] favicon   301 to Online Favicon
 
 ## About Config
 
-+ [ ] Dev/Prod Mode
++ [x] Dev Mode
 + see [viper](https://github.com/spf13/viper)
 
 ## About ORM
 
-+ [ ] Debug in Dev Mode
++ [x] Debug in Dev Mode
 + see [gorm](https://github.com/jinzhu/gorm)
