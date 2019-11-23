@@ -101,6 +101,7 @@ func signJWT(key interface{}) sola.Middleware {
 				Name:  authCookieCacheKey,
 				Value: jwtAuthPrefix + t,
 			})
+			c[CtxToken] = t
 			return next(c)
 		}
 	}
@@ -170,6 +171,7 @@ func authJWT(key interface{}) sola.Middleware {
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				var tmp map[string]interface{} = claims
 				c[CtxClaims] = tmp
+				c[CtxToken] = tokenString
 				return next(c)
 			}
 			return c.Handle(http.StatusForbidden)(c)

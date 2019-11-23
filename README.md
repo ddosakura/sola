@@ -87,6 +87,7 @@ type (
 	+ auth.username		Base Auth 用户名
 	+ auth.password		Base Auth 密码
 	+ auth.claims		JWT Auth Payload
+	+ auth.token        签发的 JWT
 
 ### Builtin Middleware
 

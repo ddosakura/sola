@@ -28,6 +28,7 @@ const (
 	CtxUsername = "auth.username"
 	CtxPassword = "auth.password"
 	CtxClaims   = "auth.claims"
+	CtxToken    = "auth.token"
 )
 
 // error(s)
