@@ -2,13 +2,37 @@ package sola
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/jinzhu/gorm"
 )
 
 type (
 	// Context for Middleware
-	Context map[string]interface{}
+	Context interface {
+		// set/get
+		Set(key string, value interface{})
+		Get(key string) interface{}
+
+		// api
+		Sola() *Sola
+		SetCookie(cookie *http.Cookie)
+		Request() *http.Request
+		Response() http.ResponseWriter
+
+		// Writer
+		Blob(code int, contentType string, bs []byte) (err error)
+		HTML(code int, data string) error
+		String(code int, data string) error
+		JSON(code int, data interface{}) error
+
+		// handler
+		Handle(code int) Handler
+	}
+	context struct {
+		lock  sync.RWMutex
+		store map[string]interface{}
+	}
 
 	// Handler func
 	Handler func(Context) error
@@ -49,10 +73,12 @@ func (s *Sola) Use(m Middleware) {
 
 // ServeHTTP to impl http handler
 func (s *Sola) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	c := Context{}
-	c[CtxSola] = s
-	c[CtxRequest] = r
-	c[CtxResponse] = w
+	c := &context{
+		store: map[string]interface{}{},
+	}
+	c.Set(CtxSola, s)
+	c.Set(CtxRequest, r)
+	c.Set(CtxResponse, w)
 
 	h := Merge(s.middlewares...).Handler()
 	if err := h(c); err != nil {

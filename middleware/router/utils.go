@@ -25,5 +25,5 @@ func CtxParam(key string) string {
 
 // Param in route
 func Param(c sola.Context, key string) string {
-	return c[CtxParam(key)].(string)
+	return c.Get(CtxParam(key)).(string)
 }

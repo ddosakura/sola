@@ -55,8 +55,10 @@ c.JSON(http.StatusOK, &MyResponse{
 
 ### Builtin Writer
 
-+ [x] String	普通文本
-+ [x] JSON		JSON 格式
++ [x] Blob		二进制
++ [x] HTML      HTML(text/html)
++ [x] String	普通文本(text/plain)
++ [x] JSON		JSON 格式(application/json)
 
 ## About Middleware
 
@@ -65,7 +67,30 @@ c.JSON(http.StatusOK, &MyResponse{
 ```go
 type (
 	// Context for Middleware
-	Context map[string]interface{}
+	Context interface {
+		// Set/Get
+		Set(key string, value interface{})
+		Get(key string) interface{}
+
+		// Api
+		Sola() *Sola
+		SetCookie(cookie *http.Cookie)
+		Request() *http.Request
+		Response() http.ResponseWriter
+
+		// Writer
+		Blob(code int, contentType string, bs []byte) (err error)
+		HTML(code int, data string) error
+		String(code int, data string) error
+		JSON(code int, data interface{}) error
+
+		// Handler
+		Handle(code int) Handler
+	}
+	context struct {
+		lock  sync.RWMutex
+		store map[string]interface{}
+	}
 
 	// Handler func
 	Handler func(Context) error

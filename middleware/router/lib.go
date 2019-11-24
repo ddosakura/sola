@@ -80,7 +80,7 @@ func (r *Router) Routes() sola.Middleware {
 					params[k] = v
 				}
 				for k, v := range params {
-					c[CtxParam(k)] = v
+					c.Set(CtxParam(k), v)
 				}
 				return meta.h(c)
 			}

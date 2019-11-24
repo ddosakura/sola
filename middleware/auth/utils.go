@@ -29,5 +29,5 @@ func basicAuth(username, password string) string {
 
 // Claims Reader
 func Claims(c sola.Context, key string) interface{} {
-	return c[CtxClaims].(map[string]interface{})[key]
+	return c.Get(CtxClaims).(map[string]interface{})[key]
 }

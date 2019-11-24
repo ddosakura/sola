@@ -70,8 +70,8 @@ func Sign(t Type, key interface{}) sola.Middleware {
 func signBase(next sola.Handler) sola.Handler {
 	return func(c sola.Context) error {
 		// 可取代浏览器默认弹窗的方式
-		username, ok1 := c[CtxUsername].(string)
-		password, ok2 := c[CtxPassword].(string)
+		username, ok1 := c.Get(CtxUsername).(string)
+		password, ok2 := c.Get(CtxPassword).(string)
 		if !ok1 || !ok2 {
 			return c.Handle(http.StatusBadRequest)(c)
 		}
@@ -86,7 +86,7 @@ func signBase(next sola.Handler) sola.Handler {
 func signJWT(key interface{}) sola.Middleware {
 	return func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
-			tmp := c[CtxClaims]
+			tmp := c.Get(CtxClaims)
 			if tmp == nil {
 				return ErrNoClaims
 			}
@@ -101,7 +101,7 @@ func signJWT(key interface{}) sola.Middleware {
 				Name:  authCookieCacheKey,
 				Value: jwtAuthPrefix + t,
 			})
-			c[CtxToken] = t
+			c.Set(CtxToken, t)
 			return next(c)
 		}
 	}
@@ -170,8 +170,8 @@ func authJWT(key interface{}) sola.Middleware {
 			}
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 				var tmp map[string]interface{} = claims
-				c[CtxClaims] = tmp
-				c[CtxToken] = tokenString
+				c.Set(CtxClaims, tmp)
+				c.Set(CtxToken, tokenString)
 				return next(c)
 			}
 			return c.Handle(http.StatusForbidden)(c)

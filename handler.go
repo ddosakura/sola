@@ -10,7 +10,7 @@ func (s *Sola) SetHandler(code int, h Handler) {
 }
 
 // Handle Selector
-func (c *Context) Handle(code int) Handler {
+func (c *context) Handle(code int) Handler {
 	fn := c.Sola().handlers[code]
 	if fn == nil {
 		switch code {
