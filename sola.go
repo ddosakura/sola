@@ -66,6 +66,11 @@ func New() *Sola {
 	}
 }
 
+// Dev Mode
+func (s *Sola) Dev() {
+	s.devMode = true
+}
+
 // Use Middleware
 func (s *Sola) Use(m Middleware) {
 	s.middlewares = append(s.middlewares, m)

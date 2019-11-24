@@ -126,11 +126,12 @@ type (
 	+ 可用于 statik
 	+ 可用于 afero
 	+ ...
-+ [ ] proxy     反向代理中间件(取代原 backup、favicon 中间件)
-	+ 考虑嵌入 lua 脚本：https://github.com/yuin/gopher-lua
++ [x] proxy     反向代理中间件(取代原 backup、favicon 中间件)
+	+ [x] backup    301 to other host - e.g. http -> https
+	+ [x] favicon   301 to Online Favicon
+	+ 嵌入 lua 脚本：https://github.com/yuin/gopher-lua
+	+ [ ] 完善
 + [x] router    路由中间件
-+ [x] backup    301 to other host - e.g. http -> https
-+ [x] favicon   301 to Online Favicon
 
 ## About Config
 
