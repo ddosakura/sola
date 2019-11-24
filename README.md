@@ -41,8 +41,16 @@ func main() {
 
 Reader 可简化 Request 的读取：
 
+```go
+var a ReqLogin
+if err := c.GetJSON(&a); err != nil {
+	return err
+}
+```
+
+### Builtin Reader
+
 + [x] GetJSON   JSON
-+ [ ] GetFile	文件
 
 ## About Writer
 
@@ -66,7 +74,7 @@ c.JSON(http.StatusOK, &MyResponse{
 + [x] HTML      HTML(text/html)
 + [x] String	普通文本(text/plain)
 + [x] JSON		JSON(application/json)
-+ [ ] File      文件
++ [x] File      文件 - 兼容 afero
 
 ## About Middleware
 
@@ -80,7 +88,7 @@ type (
 		Set(key string, value interface{})
 		Get(key string) interface{}
 
-		// Api
+		// API
 		Sola() *Sola
 		SetCookie(cookie *http.Cookie)
 		Request() *http.Request
@@ -91,6 +99,10 @@ type (
 		HTML(code int, data string) error
 		String(code int, data string) error
 		JSON(code int, data interface{}) error
+		File(f File) (err error)
+
+		// Reader
+		GetJSON(data interface{}) error
 
 		// Handler
 		Handle(code int) Handler

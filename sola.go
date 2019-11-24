@@ -25,6 +25,7 @@ type (
 		HTML(code int, data string) error
 		String(code int, data string) error
 		JSON(code int, data interface{}) error
+		File(f File) (err error)
 
 		// Reader
 		GetJSON(data interface{}) error

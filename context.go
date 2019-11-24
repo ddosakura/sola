@@ -2,8 +2,10 @@ package sola
 
 import (
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 )
 
 // === Set/Get ===
@@ -97,6 +99,24 @@ func (c *context) JSON(code int, data interface{}) error {
 		return err
 	}
 	return c.Blob(code, MIMEApplicationJSONCharsetUTF8, bs)
+}
+
+// File for Reader
+type File interface {
+	io.ReadSeeker
+	Close() error
+	Stat() (os.FileInfo, error)
+}
+
+// File Writer
+func (c *context) File(f File) (err error) {
+	defer f.Close()
+	var fi os.FileInfo
+	if fi, err = f.Stat(); err != nil {
+		return err
+	}
+	http.ServeContent(c.Response(), c.Request(), fi.Name(), fi.ModTime(), f)
+	return
 }
 
 // === Reader ===
