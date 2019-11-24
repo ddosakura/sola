@@ -10,11 +10,11 @@ import (
 type (
 	// Context for Middleware
 	Context interface {
-		// set/get
+		// Set/Get
 		Set(key string, value interface{})
 		Get(key string) interface{}
 
-		// api
+		// API
 		Sola() *Sola
 		SetCookie(cookie *http.Cookie)
 		Request() *http.Request
@@ -26,7 +26,10 @@ type (
 		String(code int, data string) error
 		JSON(code int, data interface{}) error
 
-		// handler
+		// Reader
+		GetJSON(data interface{}) error
+
+		// Handler
 		Handle(code int) Handler
 	}
 	context struct {

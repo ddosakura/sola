@@ -37,6 +37,13 @@ func main() {
 
 + [Example 仓库地址](https://github.com/it-repo/box-example)
 
+## About Reader
+
+Reader 可简化 Request 的读取：
+
++ [x] GetJSON   JSON
++ [ ] GetFile	文件
+
 ## About Writer
 
 Writer 可简化 Response 的书写：
@@ -58,7 +65,8 @@ c.JSON(http.StatusOK, &MyResponse{
 + [x] Blob		二进制
 + [x] HTML      HTML(text/html)
 + [x] String	普通文本(text/plain)
-+ [x] JSON		JSON 格式(application/json)
++ [x] JSON		JSON(application/json)
++ [ ] File      文件
 
 ## About Middleware
 

@@ -2,6 +2,7 @@ package sola
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
 )
 
@@ -96,4 +97,19 @@ func (c *context) JSON(code int, data interface{}) error {
 		return err
 	}
 	return c.Blob(code, MIMEApplicationJSONCharsetUTF8, bs)
+}
+
+// === Reader ===
+
+// JSON Reader
+func (c *context) GetJSON(data interface{}) error {
+	r := c.Request()
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	if err = json.Unmarshal(body, data); err != nil {
+		return err
+	}
+	return nil
 }
