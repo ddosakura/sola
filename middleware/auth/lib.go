@@ -16,6 +16,18 @@ func defaultSuccess(next sola.Handler) sola.Handler {
 	return defaultSuccessFunc
 }
 
+func loadAuthCache(next sola.Handler) sola.Handler {
+	return func(c sola.Context) error {
+		r := c.Request()
+		cache, err := r.Cookie(authCookieCacheKey)
+		tmp := r.Header.Get("Authorization")
+		if tmp == "" && err == nil {
+			r.Header.Set("Authorization", cache.Value)
+		}
+		return next(c)
+	}
+}
+
 // New Auth Middleware
 func New(signAuth, pre, success sola.Middleware) sola.Middleware {
 	if pre == nil {
@@ -24,17 +36,7 @@ func New(signAuth, pre, success sola.Middleware) sola.Middleware {
 	if success == nil {
 		success = defaultSuccess
 	}
-	return sola.Merge(func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			r := c.Request()
-			cache, err := r.Cookie(authCookieCacheKey)
-			tmp := r.Header.Get("Authorization")
-			if tmp == "" && err == nil {
-				r.Header.Set("Authorization", cache.Value)
-			}
-			return next(c)
-		}
-	}, pre, signAuth, success)
+	return sola.Merge(loadAuthCache, pre, signAuth, success)
 }
 
 // NewFunc Auth Handler
@@ -45,17 +47,7 @@ func NewFunc(signAuth, pre sola.Middleware, success sola.Handler) sola.Handler {
 	if success == nil {
 		success = defaultSuccessFunc
 	}
-	return sola.MergeFunc(success, func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			r := c.Request()
-			cache, err := r.Cookie(authCookieCacheKey)
-			tmp := r.Header.Get("Authorization")
-			if tmp == "" && err == nil {
-				r.Header.Set("Authorization", cache.Value)
-			}
-			return next(c)
-		}
-	}, pre, signAuth)
+	return sola.MergeFunc(success, loadAuthCache, pre, signAuth)
 }
 
 // Sign Token
@@ -76,6 +68,7 @@ func signBase(next sola.Handler) sola.Handler {
 			return c.Handle(http.StatusBadRequest)(c)
 		}
 		c.SetCookie(&http.Cookie{
+			Path:  "/",
 			Name:  authCookieCacheKey,
 			Value: "Basic " + basicAuth(username, password),
 		})
@@ -98,6 +91,7 @@ func signJWT(key interface{}) sola.Middleware {
 				return err
 			}
 			c.SetCookie(&http.Cookie{
+				Path:  "/",
 				Name:  authCookieCacheKey,
 				Value: jwtAuthPrefix + t,
 			})
