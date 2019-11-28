@@ -18,27 +18,26 @@ type Meta struct {
 // Router Middleware
 type Router struct {
 	Prefix string
-	routes map[string]*Meta
+	routes []*Meta
 }
 
 // New Router
 func New() *Router {
 	return &Router{
 		Prefix: "",
-		routes: map[string]*Meta{},
+		routes: []*Meta{},
 	}
 }
 
 // Bind "method host/url"
 func (r *Router) Bind(match string, m sola.Middleware) {
-	method, host, urls := parse(match)
-	r.routes[match] = &Meta{strings.ToUpper(method), host, urls, m.Handler()}
+	r.BindFunc(match, m.Handler())
 }
 
 // BindFunc "method host/url"
 func (r *Router) BindFunc(match string, h sola.Handler) {
 	method, host, urls := parse(match)
-	r.routes[match] = &Meta{strings.ToUpper(method), host, urls, h}
+	r.routes = append(r.routes, &Meta{strings.ToUpper(method), host, urls, h})
 }
 
 // Routes gen Middleware
