@@ -2,6 +2,8 @@
 
 A simple golang web framwork based middleware.
 
++ [Change Log](./CHANGELOG.md)
+
 ## Quick Start
 
 基本的 sola 程序 (Hello World) 如下：
@@ -133,6 +135,8 @@ type (
 	+ auth.password		Base Auth 密码
 	+ auth.claims		JWT Auth Payload
 	+ auth.token        签发的 JWT
++ logger	日志中间件
+	+ logger			message chan
 
 ### Builtin Middleware
 
