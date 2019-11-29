@@ -15,7 +15,7 @@ type Option struct {
 	NewModel        func() interface{}
 	DefaultPageSize int
 
-	GetFunc    func(id int) interface{}
+	GetFunc    func(id string) interface{}
 	ListFunc   func(page int, size int) interface{}
 	PostFunc   func(interface{}) error
 	PutFunc    func(interface{}) error
@@ -63,10 +63,7 @@ func New(o *Option) *router.Router {
 
 	if o.GetFunc != nil {
 		r.BindFunc("GET "+o.Path+"/:id", func(c sola.Context) error {
-			id, err := strconv.Atoi(router.Param(c, "id"))
-			if err != nil {
-				return err
-			}
+			id := router.Param(c, "id")
 			if model := o.GetFunc(id); model != nil {
 				return success(c, model)
 			}
