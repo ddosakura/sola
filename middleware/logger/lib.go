@@ -44,12 +44,22 @@ func New(bufSize int, h Handler) sola.Middleware {
 
 // Printf to Logger
 func Printf(c sola.Context, format string, v ...interface{}) {
-	ch := c.Get(CtxLogger).(chan<- *Log)
-	ch <- &Log{false, format, v, time.Now()}
+	if ch := getLogger(c); ch != nil {
+		ch <- &Log{false, format, v, time.Now()}
+	}
 }
 
 // Action to Logger
 func Action(c sola.Context, v ...interface{}) {
-	ch := c.Get(CtxLogger).(chan<- *Log)
-	ch <- &Log{true, "", v, time.Now()}
+	if ch := getLogger(c); ch != nil {
+		ch <- &Log{true, "", v, time.Now()}
+	}
+}
+
+func getLogger(c sola.Context) chan<- *Log {
+	ch := c.Get(CtxLogger)
+	if ch == nil {
+		return nil
+	}
+	return ch.(chan<- *Log)
 }
