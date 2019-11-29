@@ -10,7 +10,7 @@
 ### Features
 
 + 合并了 v1 中的一些中间件
-+ 新增了 cors、swagger、logger
++ 新增了中间件： cors、swagger、logger、rest、graphql
 + 将一些 ctx 的扩展操作移到 x 包中（预发）
 + 增加独立的 box 仓库存放扩展中间件
 

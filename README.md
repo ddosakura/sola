@@ -144,6 +144,7 @@ type (
 	+ [x] 自定义返回内容
 	+ [x] Dev Mode(500)
 + [x] cors		跨域中间件 - 参考 [koa2-cors](https://github.com/zadzbw/koa2-cors)
++ [x] graphql   GraphQL 中间件
 + [x] logger    日志中间件
 + [x] native	go 原生 handler 转换中间件(取代原静态文件中间件)
 	+ [x] static    原静态文件中间件
@@ -159,7 +160,7 @@ type (
 + [x] rest      RESTful API 中间件
 + [x] router    路由中间件
 	+ [ ] 中间件改造 xrouter?
-+ [ ] swagger   API 文档中间件
++ [x] swagger   API 文档中间件
 
 ## About Config
 
