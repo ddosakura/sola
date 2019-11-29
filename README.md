@@ -156,6 +156,7 @@ type (
 	+ [x] favicon   301 to Online Favicon
 	+ 嵌入 lua 脚本：https://github.com/yuin/gopher-lua
 	+ [ ] 完善
++ [x] rest      RESTful API 中间件
 + [x] router    路由中间件
 	+ [ ] 中间件改造 xrouter?
 + [ ] swagger   API 文档中间件
