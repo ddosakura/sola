@@ -1,5 +1,13 @@
 # Change Log
 
+## v2.1.0 (xxxx-xx-xx)
+
+### Bug Fixes
+
+### Features
+
+### Breaking Changes
+
 ## v2.0.0-alpha (xxxx-xx-xx)
 
 ### Bug Fixes
@@ -10,7 +18,7 @@
 ### Features
 
 + 合并了 v1 中的一些中间件
-+ 新增了中间件： cors、swagger、logger、rest、graphql、(ws)WebSocket、xrouter
++ 新增了中间件： cors、swagger、logger、rest、graphql、(ws)WebSocket、新router
 + 增加独立的 box 仓库存放扩展中间件
 
 ### Breaking Changes

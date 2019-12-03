@@ -19,6 +19,7 @@ type ErrorHandler func(uuid.UUID, error)
 type Option struct {
 	Handler Handler
 
+	// Optional
 	First        func(uuid.UUID)
 	ReceiveError ErrorHandler
 	SendError    ErrorHandler
@@ -44,6 +45,9 @@ type Send func(uuid.UUID, []byte)
 
 // New WebSocket Handler
 func New(o *Option) (sola.Handler, Send) {
+	if o == nil {
+		panic(ErrOption)
+	}
 	if o.Handler == nil {
 		panic(ErrOption)
 	}

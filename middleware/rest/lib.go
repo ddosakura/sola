@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
 	"strings"
@@ -11,16 +12,22 @@ import (
 
 // Option of RESTful Middleware
 type Option struct {
-	Path            string
-	NewModel        func() interface{}
-	DefaultPageSize int
+	NewModel func() interface{}
 
-	GetFunc    func(id string) interface{}
-	ListFunc   func(page, size int) interface{}
-	PostFunc   func(interface{}) error
-	PutFunc    func(interface{}) error
-	DeleteFunc func(id string) error
+	// Optional
+	DefaultPageSize int
+	Path            string
+	GetFunc         func(id string) interface{}
+	ListFunc        func(page, size int) interface{}
+	PostFunc        func(interface{}) error
+	PutFunc         func(interface{}) error
+	DeleteFunc      func(id string) error
 }
+
+// error(s)
+var (
+	ErrOption = errors.New("Must set NewModel when use PostFunc/PutFunc")
+)
 
 // Response Common
 type Response struct {
@@ -55,6 +62,13 @@ func fail(c sola.Context, msg ...string) error {
 
 // New RESTful Router
 func New(o *Option) *router.Router {
+	if o == nil {
+		o = &Option{}
+	}
+	if o.NewModel == nil &&
+		(o.PostFunc != nil || o.PutFunc != nil) {
+		panic(ErrOption)
+	}
 	if o.DefaultPageSize < 1 {
 		o.DefaultPageSize = 5
 	}
