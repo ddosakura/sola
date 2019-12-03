@@ -41,7 +41,7 @@ func first(uuid.UUID)       {}
 func pass(uuid.UUID, error) {}
 
 // Send Action
-type Send func(uuid.UUID, []byte)
+type Send func(uuid.UUID, []byte) error
 
 // New WebSocket Handler
 func New(o *Option) (sola.Handler, Send) {
@@ -71,19 +71,19 @@ func New(o *Option) (sola.Handler, Send) {
 		h.ServeHTTP(w, r)
 		return nil
 	}
-	send := func(UUID uuid.UUID, v []byte) {
+	send := func(UUID uuid.UUID, v []byte) error {
 		if UUID == ALL {
 			for id, w := range m {
 				go sendMessage(o, id, w, v)
 			}
-		} else {
-			w := m[UUID]
-			if w == nil {
-				o.SendError(UUID, ErrNoUUID)
-			} else {
-				go sendMessage(o, UUID, m[UUID], v)
-			}
+			return nil
 		}
+		w := m[UUID]
+		if w == nil {
+			return ErrNoUUID
+		}
+		go sendMessage(o, UUID, m[UUID], v)
+		return nil
 	}
 	return h, send
 }

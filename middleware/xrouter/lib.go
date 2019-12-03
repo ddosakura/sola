@@ -1,4 +1,4 @@
-package xrouter
+package router
 
 import (
 	"net/http"

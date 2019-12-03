@@ -16,8 +16,7 @@ func SendWrap(send Send) XSend {
 		if e != nil {
 			return e
 		}
-		send(UUID, bs)
-		return nil
+		return send(UUID, bs)
 	}
 }
 
