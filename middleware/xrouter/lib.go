@@ -8,16 +8,27 @@ import (
 
 // Router Middleware Builder
 type Router struct {
-	meta *Meta
-
+	option      *Option
+	meta        *Meta
 	middlewares []sola.Middleware
 	middleware  sola.Middleware
 }
 
+// Option of Router
+type Option struct {
+	Pattern string
+	// use sola handler if not match
+	UseNotFound bool
+}
+
 // New Router Middleware
-func New(pattern string) *Router {
+func New(o *Option) *Router {
+	if o == nil {
+		o = &Option{}
+	}
 	return &Router{
-		meta:        buildMeta(pattern),
+		option:      o,
+		meta:        buildMeta(o.Pattern),
 		middlewares: []sola.Middleware{},
 	}
 }
@@ -30,17 +41,24 @@ func (r *Router) preHandle() sola.Middleware {
 }
 
 // Sub Router
-func (r *Router) Sub(pattern string) *Router {
-	meta := buildMeta(pattern)
+func (r *Router) Sub(o *Option) *Router {
+	if o == nil {
+		o = &Option{}
+	}
+	meta := buildMeta(o.Pattern)
 	sub := &Router{
 		meta:        meta,
 		middlewares: []sola.Middleware{},
 	}
 	fn := func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
+			NEXT := next
+			if o.UseNotFound {
+				NEXT = c.Handle(http.StatusNotFound)
+			}
 			if quick := match(c, false, meta); quick != nil {
 				quick()
-				return sub.preHandle()(c.Handle(http.StatusNotFound))(c)
+				return sub.preHandle()(NEXT)(c)
 			}
 			return next(c)
 		}
@@ -74,7 +92,11 @@ func (r *Router) Routes() sola.Middleware {
 		return func(c sola.Context) error {
 			if quick := match(c, false, r.meta); quick != nil {
 				quick()
-				return r.preHandle()(c.Handle(http.StatusNotFound))(c)
+				NEXT := next
+				if r.option.UseNotFound {
+					NEXT = c.Handle(http.StatusNotFound)
+				}
+				return r.preHandle()(NEXT)(c)
 			}
 			return next(c)
 		}
