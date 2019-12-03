@@ -21,7 +21,7 @@ type Router struct {
 	routes []*Meta
 }
 
-// New Router
+// New Router @deprecated
 func New() *Router {
 	return &Router{
 		Prefix: "",

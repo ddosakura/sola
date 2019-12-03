@@ -16,7 +16,7 @@ type Option struct {
 	DefaultPageSize int
 
 	GetFunc    func(id string) interface{}
-	ListFunc   func(page int, size int) interface{}
+	ListFunc   func(page, size int) interface{}
 	PostFunc   func(interface{}) error
 	PutFunc    func(interface{}) error
 	DeleteFunc func(id string) error
