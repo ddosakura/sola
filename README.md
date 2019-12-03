@@ -132,8 +132,6 @@ type (
 	+ sola				*sola.Sola
 	+ sola.request		*http.Request
 	+ sola.response		http.ResponseWriter
-+ router    路由中间件
-    + router.param.*    路径参数
 + auth		认证中间件
 	+ auth.username		Base Auth 用户名
 	+ auth.password		Base Auth 密码
@@ -141,7 +139,9 @@ type (
 	+ auth.token        签发的 JWT
 + logger	日志中间件
 	+ logger			message chan
-+ xrouter   路由中间件
++ x/router  旧路由中间件
+    + router.param.*    路径参数
++ router   新路由中间件
 	+ xrouter.meta		路由元数据
     + xrouter.param.*   路径参数
 
@@ -167,10 +167,10 @@ type (
 	+ 嵌入 lua 脚本：https://github.com/yuin/gopher-lua
 	+ [ ] 完善
 + [x] rest      RESTful API 中间件
-+ [x] router    路由中间件 (@deprecated 预计在 v2.2.x 移除)
 + [x] swagger   API 文档中间件
 + [x] ws		WebSocket 中间件
-+ [x] xrouter	新路由中间件
++ [x] x/router  旧路由中间件 (@deprecated 预计在 v2.2.x 移除)
++ [x] router	新路由中间件
 
 #### xrouter 匹配规则
 
@@ -241,7 +241,7 @@ package main
 import (
 	"github.com/ddosakura/sola/v2"
 	"github.com/ddosakura/sola/v2/middleware/auth"
-	"github.com/ddosakura/sola/v2/middleware/router"
+	"github.com/ddosakura/sola/v2/middleware/x/router"
 	"github.com/ddosakura/sola/v2/middleware/swagger"
 
 	_ "example/sola-example/api-doc/docs"

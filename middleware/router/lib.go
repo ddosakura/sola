@@ -2,89 +2,99 @@ package router
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/ddosakura/sola/v2"
 )
 
-// Meta of Router
-type Meta struct {
-	method string
-	host   string
-	urls   []string
-	h      sola.Handler
-}
-
-// Router Middleware
+// Router Middleware Builder
 type Router struct {
-	Prefix string
-	routes []*Meta
+	option      *Option
+	meta        *Meta
+	middlewares []sola.Middleware
+	middleware  sola.Middleware
 }
 
-// New Router @deprecated
-func New() *Router {
+// Option of Router
+type Option struct {
+	Pattern string
+	// use sola handler if not match
+	UseNotFound bool
+}
+
+// New Router Middleware
+func New(o *Option) *Router {
+	if o == nil {
+		o = &Option{}
+	}
 	return &Router{
-		Prefix: "",
-		routes: []*Meta{},
+		option:      o,
+		meta:        buildMeta(o.Pattern),
+		middlewares: []sola.Middleware{},
 	}
 }
 
-// Bind "method host/url"
-func (r *Router) Bind(match string, m sola.Middleware) {
-	r.BindFunc(match, m.Handler())
+func (r *Router) preHandle() sola.Middleware {
+	if r.middleware == nil {
+		r.middleware = sola.Merge(r.middlewares...)
+	}
+	return r.middleware
 }
 
-// BindFunc "method host/url"
-func (r *Router) BindFunc(match string, h sola.Handler) {
-	method, host, urls := parse(match)
-	r.routes = append(r.routes, &Meta{strings.ToUpper(method), host, urls, h})
+// Sub Router
+func (r *Router) Sub(o *Option) *Router {
+	if o == nil {
+		o = &Option{}
+	}
+	meta := buildMeta(o.Pattern)
+	sub := &Router{
+		meta:        meta,
+		middlewares: []sola.Middleware{},
+	}
+	fn := func(next sola.Handler) sola.Handler {
+		return func(c sola.Context) error {
+			if ctx := match(c, false, meta); ctx != nil {
+				NEXT := next
+				if o.UseNotFound {
+					NEXT = c.Handle(http.StatusNotFound)
+				}
+				return sub.preHandle()(sola.OriginContext(NEXT))(ctx)
+			}
+			return next(c)
+		}
+	}
+	r.middlewares = append(r.middlewares, fn)
+	return sub
 }
 
-// Routes gen Middleware
+// Use Middleware
+func (r *Router) Use(ms ...sola.Middleware) {
+	r.middlewares = append(r.middlewares, ms...)
+}
+
+// Bind Handler
+func (r *Router) Bind(pattern string, h sola.Handler) {
+	meta := buildMeta(pattern)
+	fn := func(next sola.Handler) sola.Handler {
+		return func(c sola.Context) error {
+			if ctx := match(c, true, meta); ctx != nil {
+				return h(ctx)
+			}
+			return next(c)
+		}
+	}
+	r.middlewares = append(r.middlewares, fn)
+}
+
+// Routes Middleware
 func (r *Router) Routes() sola.Middleware {
 	return func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
-			req := c.Request()
-		Match:
-			for _, meta := range r.routes {
-				if meta.method != "" && meta.method != req.Method {
-					continue
+			if ctx := match(c, false, r.meta); ctx != nil {
+				NEXT := next
+				if r.option.UseNotFound {
+					NEXT = c.Handle(http.StatusNotFound)
 				}
-				if meta.host != "" && meta.host != req.Host {
-					continue
-				}
-
-				URL := req.URL.EscapedPath()
-				if !strings.HasPrefix(URL, r.Prefix) {
-					continue
-				}
-				URL = strings.Replace(URL, r.Prefix, "", 1)
-				_, _, URLs := parse(URL)
-				if len(URLs) < len(meta.urls) {
-					continue
-				}
-				params := map[string]string{}
-				for i, path := range meta.urls {
-					if i == 0 { // is host
-						continue
-					}
-					v := URLs[i]
-					if path == v {
-						continue
-					}
-					if !strings.HasPrefix(path, ":") {
-						continue Match
-					}
-					k := strings.Replace(path, ":", "", 1)
-					params[k] = v
-				}
-				for k, v := range params {
-					c.Set(CtxParam(k), v)
-				}
-				return meta.h(c)
-			}
-			if next == nil {
-				return c.Handle(http.StatusNotFound)(c)
+				return r.preHandle()(sola.OriginContext(NEXT))(ctx)
 			}
 			return next(c)
 		}

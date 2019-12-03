@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/ddosakura/sola/v2"
-	"github.com/ddosakura/sola/v2/middleware/router"
+	"github.com/ddosakura/sola/v2/middleware/x/router"
 )
 
 // Option of RESTful Middleware
