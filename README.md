@@ -184,12 +184,16 @@ type (
 
 ```go
 // 匹配 /api/v1/*
-r := router.New("/api/v1")
+r := router.New(&router.Option{
+	Pattern: "/api/v1",
+})
 // 严格匹配 /api/v1/hello
 r.Bind("/hello", hello("Hello World!"))
 {
 	// 匹配 /api/v1/user/*
-	sub := r.Sub("/user")
+	sub := r.Sub(&router.Option{
+		Pattern: "/user",
+	})
 	// 严格匹配 /api/v1/user/hello
 	sub.Bind("/hello", hello("Hello!"))
 	// 严格匹配 /api/v1/user/hello 失败后执行该中间件
@@ -205,12 +209,12 @@ r.Bind("/hello", hello("Hello World!"))
 	sub.Bind("/infox/*", hello("user infox"))
 	// 严格匹配 /api/v1/user/:id （路径参数 id）
 	sub.Bind("/:id", get("id"))
-	// sub 没有默认匹配，调用 sola 的 404 Handler
+	// sub 没有默认匹配
+	// 如果 sub 加了 UseNotFound 选项，将调用 sola 的 404 Handler
+	// 否则不会调用，将继续匹配后面的 `/*`
 }
 // 匹配 /api/v1/* (默认匹配)
 r.Bind("/*", error404)
-// 因为默认匹配拦截了所有匹配，所以不会调用 sola 的 404 Handler
-
 // 使用路由
 app.Use(r.Routes())
 ```

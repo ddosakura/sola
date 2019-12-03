@@ -8,7 +8,24 @@ import (
 	"os"
 )
 
+func newContext() *context {
+	return &context{
+		store: map[string]interface{}{},
+	}
+}
+
 // === Set/Get ===
+
+func (c *context) Origin() Context {
+	return c.origin
+}
+
+// Shadow Context will search origin context if no match key
+func (c *context) Shadow() Context {
+	shadow := newContext()
+	shadow.origin = c
+	return shadow
+}
 
 // Set Ctx
 func (c *context) Set(key string, value interface{}) {
@@ -21,7 +38,11 @@ func (c *context) Set(key string, value interface{}) {
 func (c *context) Get(key string) interface{} {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
-	return c.store[key]
+	v := c.store[key]
+	if v == nil && c.origin != nil {
+		v = c.origin.Get(key)
+	}
+	return v
 }
 
 // === API ===

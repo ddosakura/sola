@@ -52,13 +52,12 @@ func (r *Router) Sub(o *Option) *Router {
 	}
 	fn := func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
-			NEXT := next
-			if o.UseNotFound {
-				NEXT = c.Handle(http.StatusNotFound)
-			}
-			if quick := match(c, false, meta); quick != nil {
-				quick()
-				return sub.preHandle()(NEXT)(c)
+			if ctx := match(c, false, meta); ctx != nil {
+				NEXT := next
+				if o.UseNotFound {
+					NEXT = c.Handle(http.StatusNotFound)
+				}
+				return sub.preHandle()(sola.OriginContext(NEXT))(ctx)
 			}
 			return next(c)
 		}
@@ -77,8 +76,8 @@ func (r *Router) Bind(pattern string, h sola.Handler) {
 	meta := buildMeta(pattern)
 	fn := func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
-			if quick := match(c, true, meta); quick != nil {
-				return h(c)
+			if ctx := match(c, true, meta); ctx != nil {
+				return h(ctx)
 			}
 			return next(c)
 		}
@@ -90,13 +89,12 @@ func (r *Router) Bind(pattern string, h sola.Handler) {
 func (r *Router) Routes() sola.Middleware {
 	return func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
-			if quick := match(c, false, r.meta); quick != nil {
-				quick()
+			if ctx := match(c, false, r.meta); ctx != nil {
 				NEXT := next
 				if r.option.UseNotFound {
 					NEXT = c.Handle(http.StatusNotFound)
 				}
-				return r.preHandle()(NEXT)(c)
+				return r.preHandle()(sola.OriginContext(NEXT))(ctx)
 			}
 			return next(c)
 		}

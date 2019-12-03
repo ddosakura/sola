@@ -11,6 +11,8 @@ type (
 	// Context for Middleware
 	Context interface {
 		// Set/Get
+		Origin() Context
+		Shadow() Context
 		Set(key string, value interface{})
 		Get(key string) interface{}
 
@@ -34,8 +36,9 @@ type (
 		Handle(code int) Handler
 	}
 	context struct {
-		lock  sync.RWMutex
-		store map[string]interface{}
+		origin Context
+		lock   sync.RWMutex
+		store  map[string]interface{}
 	}
 
 	// Handler func
@@ -82,9 +85,7 @@ func (s *Sola) Use(ms ...Middleware) {
 
 // ServeHTTP to impl http handler
 func (s *Sola) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	c := &context{
-		store: map[string]interface{}{},
-	}
+	c := newContext()
 	c.Set(CtxSola, s)
 	c.Set(CtxRequest, r)
 	c.Set(CtxResponse, w)

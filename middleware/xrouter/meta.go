@@ -63,7 +63,7 @@ func buildMeta(pattern string) *Meta {
 }
 
 // route match pattern
-func match(c sola.Context, strict bool, pattern *Meta) func() {
+func match(c sola.Context, strict bool, pattern *Meta) sola.Context {
 	m := newMeta(c)
 	if pattern.Method != "" && pattern.Method != m.Method {
 		return nil
@@ -96,14 +96,14 @@ func match(c sola.Context, strict bool, pattern *Meta) func() {
 		c.Set(CtxParam(k), v)
 	}
 
-	return func() {
-		mx := &Meta{}
-		mx.Ctx = m.Ctx
-		mx.Method = m.Method
-		mx.Host = m.Host
-		mx.Path = m.Path[pLen:]
-		c.Set(CtxMeta, mx)
-	}
+	mx := &Meta{}
+	mx.Ctx = m.Ctx
+	mx.Method = m.Method
+	mx.Host = m.Host
+	mx.Path = m.Path[pLen:]
+	shadow := c.Shadow()
+	shadow.Set(CtxMeta, mx)
+	return shadow
 }
 
 // CtxParam Builder
