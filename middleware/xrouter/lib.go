@@ -50,8 +50,8 @@ func (r *Router) Sub(pattern string) *Router {
 }
 
 // Use Middleware
-func (r *Router) Use(m sola.Middleware) {
-	r.middlewares = append(r.middlewares, m)
+func (r *Router) Use(ms ...sola.Middleware) {
+	r.middlewares = append(r.middlewares, ms...)
 }
 
 // Bind Handler

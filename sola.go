@@ -76,8 +76,8 @@ func (s *Sola) Dev() {
 }
 
 // Use Middleware
-func (s *Sola) Use(m Middleware) {
-	s.middlewares = append(s.middlewares, m)
+func (s *Sola) Use(ms ...Middleware) {
+	s.middlewares = append(s.middlewares, ms...)
 }
 
 // ServeHTTP to impl http handler
