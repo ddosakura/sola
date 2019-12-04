@@ -7,12 +7,14 @@ import (
 	"strings"
 
 	"github.com/ddosakura/sola/v2"
-	"github.com/ddosakura/sola/v2/middleware/x/router"
+	"github.com/ddosakura/sola/v2/middleware/router"
 )
 
 // Option of RESTful Middleware
 type Option struct {
-	NewModel func() interface{}
+	Root        *router.Router
+	UseNotFound bool
+	NewModel    func() interface{}
 
 	// Optional
 	DefaultPageSize int
@@ -61,7 +63,7 @@ func fail(c sola.Context, msg ...string) error {
 }
 
 // New RESTful Router
-func New(o *Option) *router.Router {
+func New(o *Option) (r *router.Router) {
 	if o == nil {
 		o = &Option{}
 	}
@@ -73,10 +75,18 @@ func New(o *Option) *router.Router {
 		o.DefaultPageSize = 5
 	}
 
-	r := router.New()
+	ro := &router.Option{
+		Pattern:     o.Path,
+		UseNotFound: o.UseNotFound,
+	}
+	if o.Root == nil {
+		r = router.New(ro)
+	} else {
+		r = o.Root.Sub(ro)
+	}
 
 	if o.GetFunc != nil {
-		r.BindFunc("GET "+o.Path+"/:id", func(c sola.Context) error {
+		r.Bind("GET /:id", func(c sola.Context) error {
 			id := router.Param(c, "id")
 			if model := o.GetFunc(id); model != nil {
 				return success(c, model)
@@ -85,7 +95,7 @@ func New(o *Option) *router.Router {
 		})
 	}
 	if o.ListFunc != nil {
-		r.BindFunc("GET "+o.Path, func(c sola.Context) error {
+		r.Bind("GET", func(c sola.Context) error {
 			r := c.Request()
 			qs := r.URL.Query()
 			page, err := strconv.Atoi(qs.Get("page"))
@@ -104,7 +114,7 @@ func New(o *Option) *router.Router {
 	}
 
 	if o.PostFunc != nil {
-		r.BindFunc("POST "+o.Path, func(c sola.Context) error {
+		r.Bind("POST", func(c sola.Context) error {
 			model := o.NewModel()
 			if err := c.GetJSON(model); err != nil {
 				return err
@@ -116,7 +126,7 @@ func New(o *Option) *router.Router {
 		})
 	}
 	if o.PutFunc != nil {
-		r.BindFunc("PUT "+o.Path, func(c sola.Context) error {
+		r.Bind("PUT", func(c sola.Context) error {
 			model := o.NewModel()
 			if err := c.GetJSON(model); err != nil {
 				return err
@@ -128,7 +138,7 @@ func New(o *Option) *router.Router {
 		})
 	}
 	if o.DeleteFunc != nil {
-		r.BindFunc("DELETE "+o.Path+"/:id", func(c sola.Context) error {
+		r.Bind("DELETE /:id", func(c sola.Context) error {
 			id := router.Param(c, "id")
 			if err := o.DeleteFunc(id); err != nil {
 				return fail(c, err.Error())

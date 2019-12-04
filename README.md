@@ -140,10 +140,10 @@ type (
 + logger	日志中间件
 	+ logger			message chan
 + x/router  旧路由中间件
-    + router.param.*    路径参数
+    + x.router.param.*    路径参数
 + router   新路由中间件
-	+ xrouter.meta		路由元数据
-    + xrouter.param.*   路径参数
+	+ router.meta		路由元数据
+    + router.param.*   路径参数
 
 > **注意：请尽量使用中间件包中提供的标准方法、常量读取上下文数据，防止内部逻辑修改导致的向后不兼容。**
 
@@ -179,6 +179,7 @@ type (
 + 不指定 Host `GET /user/:id`
 + 不指定 Method & Host `/user/:id`
 + 默认路径匹配（仅在 Bind 中使用，一般作为最后一个路径） `/*`
++ 特殊用法：仅指定 Method（用于 Bind，Path 由 Router 的 Pattern 匹配） `GET` - 支持 `net/http` 包中的所有 `Method*`
 
 样例解释：
 

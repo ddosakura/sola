@@ -20,7 +20,7 @@ func parse(match string) (method string, host string, urls []string) {
 
 // CtxParam Builder
 func CtxParam(key string) string {
-	return "router.param." + key
+	return "x.router.param." + key
 }
 
 // Param in route

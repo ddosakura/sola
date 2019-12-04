@@ -1,5 +1,25 @@
 # Change Log
 
+## v2.1.1
+
+### Bug Fixes
+
++ 新路由中间件省缺路径，仅指定方法
+
+### Features
+
++ [x] rest 适配 new router
++ [ ] auth 适配 new router
+
+#### Next Version
+
++ v2.2.x
+    + 反向代理功能完善
+
+### Breaking Changes
+
++ router & x/router 使用的 ctx key 已更改，请使用包提供的标准方法操作数据！
+
 ## v2.1.0-beta (2019-12-03)
 
 ### Bug Fixes
