@@ -8,8 +8,9 @@
 
 ### Features
 
-+ [x] rest 适配 new router
-+ [ ] auth 适配 new router
++ rest 适配 new router
++ auth 适配 new router
++ 增加 Makefile
 
 #### Next Version
 
