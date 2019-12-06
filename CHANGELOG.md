@@ -13,6 +13,7 @@
 + auth 适配 new router
 + 增加 Makefile
 + 增加热更新工具 `sola-hot`
++ 增加动态模块加载扩展
 
 #### Next Version
 

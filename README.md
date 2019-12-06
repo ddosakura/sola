@@ -59,7 +59,8 @@ linux.Keep()
 
 ## Extension
 
-+ sola-linux 平滑切换（仅 linux 可用）
++ hot			动态模块加载（使用了 plugin，仅 linux 可用）
++ sola-linux 	平滑切换（使用了大量系统调用，仅 linux 可用）
 
 ### More Example
 

@@ -28,9 +28,11 @@ ws: ./middleware/ws
 x.router: ./middleware/x/router
 	go build -o ./dist/middleware/x/router.a ./middleware/x/router
 
-extension: hot
+extension: hot sola-linux
 hot: ./extension/hot
 	go build -o ./dist/extension/hot.a ./extension/hot
+sola-linux: ./extension/sola-linux
+	go build -o ./dist/extension/sola-linux.a ./extension/sola-linux
 
 cli: sola-hot
 sola-hot: ./cli/sola-hot

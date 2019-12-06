@@ -61,14 +61,22 @@ func restart() {
 func throttle() {
 	var after <-chan time.Time
 	after = time.After(1 * time.Second)
-	for {
-		select {
-		case <-ch:
-			return
-		case <-after:
-			fmt.Println("restart")
-			restart()
-		}
+	select {
+	case <-ch:
+		return
+	case <-after:
+		fmt.Println("restart")
+		restart()
+		go readch()
+		return
+	}
+}
+
+func readch() {
+	select {
+	case <-ch:
+		// fmt.Println("first ch")
+		return
 	}
 }
 
@@ -89,13 +97,7 @@ func main() {
 
 	go run()
 
-	go func() {
-		select {
-		case <-ch:
-			// fmt.Println("first ch")
-			return
-		}
-	}()
+	go readch()
 
 	for {
 		select {
