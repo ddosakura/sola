@@ -16,6 +16,7 @@ func newContext() *context {
 
 // === Set/Get ===
 
+// Origin Context
 func (c *context) Origin() Context {
 	return c.origin
 }

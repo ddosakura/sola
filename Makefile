@@ -1,8 +1,10 @@
-all: sola auth cors graphql logger native proxy rest router swagger ws x.router
+all: sola middleware extension cli
 	echo "success!"
 
 sola: .
 	go build -o ./dist/sola.a .
+
+middleware: auth cors graphql logger native proxy rest router swagger ws x.router
 auth: ./middleware/auth
 	go build -o ./dist/middleware/auth.a ./middleware/auth
 cors: ./middleware/cors
@@ -25,3 +27,11 @@ ws: ./middleware/ws
 	go build -o ./dist/middleware/ws.a ./middleware/ws
 x.router: ./middleware/x/router
 	go build -o ./dist/middleware/x/router.a ./middleware/x/router
+
+extension: hot
+hot: ./extension/hot
+	go build -o ./dist/extension/hot.a ./extension/hot
+
+cli: sola-hot
+sola-hot: ./cli/sola-hot
+	go build -o ./dist/cli/sola-hot ./cli/sola-hot

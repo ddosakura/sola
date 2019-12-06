@@ -11,6 +11,7 @@
 + rest 适配 new router
 + auth 适配 new router
 + 增加 Makefile
++ 增加热更新工具 `sola-hot`
 
 #### Next Version
 

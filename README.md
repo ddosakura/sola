@@ -35,6 +35,15 @@ func main() {
 }
 ```
 
+## Hot Update
+
+```bash
+# 安装
+go get -u -v github.com/ddosakura/sola/cli/sola-hot
+# 在开发目录执行
+sola-hot
+```
+
 ### More Example
 
 + [Example 仓库地址](https://github.com/it-repo/box-example)
