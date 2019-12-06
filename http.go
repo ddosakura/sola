@@ -1,6 +1,7 @@
 package sola
 
 import (
+	"log"
 	"net/http"
 	"sync"
 )
@@ -12,16 +13,20 @@ func Listen(addr string, g *Sola) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		http.ListenAndServe(addr, g)
+		if e := http.ListenAndServe(addr, g); e != nil {
+			log.Println(e)
+		}
 	}()
 }
 
 // ListenTLS & Serve
-func ListenTLS(addr string, certFile string, keyFile string, g *Sola) {
+func ListenTLS(addr, certFile, keyFile string, g *Sola) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		http.ListenAndServeTLS(addr, certFile, keyFile, g)
+		if e := http.ListenAndServeTLS(addr, certFile, keyFile, g); e != nil {
+			log.Println(e)
+		}
 	}()
 }
 

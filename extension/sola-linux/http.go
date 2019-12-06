@@ -1,6 +1,7 @@
 package linux
 
 import (
+	"log"
 	"sync"
 
 	"github.com/ddosakura/sola/v2"
@@ -14,16 +15,20 @@ func Listen(addr string, g *sola.Sola) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		endless.ListenAndServe(addr, g)
+		if e := endless.ListenAndServe(addr, g); e != nil {
+			log.Println(e)
+		}
 	}()
 }
 
 // ListenTLS & Serve
-func ListenTLS(addr string, certFile string, keyFile string, g *sola.Sola) {
+func ListenTLS(addr, cert, key string, g *sola.Sola) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		endless.ListenAndServeTLS(addr, certFile, keyFile, g)
+		if e := endless.ListenAndServeTLS(addr, cert, key, g); e != nil {
+			log.Println(e)
+		}
 	}()
 }
 
