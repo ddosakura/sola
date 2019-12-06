@@ -39,10 +39,27 @@ func main() {
 
 ```bash
 # 安装
-go get -u -v github.com/ddosakura/sola/cli/sola-hot
+go get -u -v github.com/ddosakura/sola/v2/cli/sola-hot
 # 在开发目录执行
 sola-hot
 ```
+
+执行 `sola-hot` 进行热更新，运行过程中将生成临时可执行文件 `sola-dev`。
+
+linux 系统使用 `sola-linux` 监听端口可实现平滑切换（不中断请求）。 
+
+```go
+import (
+	linux "github.com/ddosakura/sola/v2/extension/sola-linux"
+)
+
+linux.Listen("127.0.0.1:3000", app)
+linux.Keep()
+```
+
+## Extension
+
++ sola-linux 平滑切换（仅 linux 可用）
 
 ### More Example
 
