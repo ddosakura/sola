@@ -73,8 +73,15 @@ func throttle() {
 }
 
 func main() {
+	l := len(os.Args)
 	watcher, err := fsnotify.NewWatcher()
-	watcher.Add(".") // TODO
+	if l <= 1 {
+		watcher.Add(".")
+	} else {
+		for _, p := range os.Args {
+			watcher.Add(p)
+		}
+	}
 	if err != nil {
 		log.Fatalln(err)
 	}
