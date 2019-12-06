@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -18,11 +19,15 @@ var (
 )
 
 func run() {
+	prog := "sola-dev"
+	if runtime.GOOS == "windows" {
+		prog += ".exe"
+	}
 	cx := exec.Command(
 		"go",
 		"build",
 		"-o",
-		"sola-dev",
+		prog,
 		".",
 	) // TODO
 	cx.Stdin = os.Stdin
