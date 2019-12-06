@@ -14,13 +14,14 @@ import (
 )
 
 var (
-	ch = make(chan struct{})
-	c  *exec.Cmd
+	isWin = runtime.GOOS == "windows"
+	ch    = make(chan struct{})
+	c     *exec.Cmd
 )
 
 func run() {
 	prog := "sola-dev"
-	if runtime.GOOS == "windows" {
+	if isWin {
 		prog += ".exe"
 	}
 	cx := exec.Command(
@@ -48,9 +49,12 @@ func run() {
 
 func restart() {
 	// fmt.Println("up", c.Process.Signal(syscall.SIGHUP))
-	fmt.Println("int", c.Process.Signal(syscall.SIGINT))
-	fmt.Println("term", c.Process.Signal(syscall.SIGTERM))
-	// fmt.Println("kill", c.Process.Kill())
+	if isWin {
+		fmt.Println("kill", c.Process.Kill())
+	} else {
+		fmt.Println("int", c.Process.Signal(syscall.SIGINT))
+		fmt.Println("term", c.Process.Signal(syscall.SIGTERM))
+	}
 	go run()
 }
 
