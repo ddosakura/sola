@@ -171,10 +171,13 @@ type (
 + logger	日志中间件
 	+ logger			message chan
 + x/router  旧路由中间件
-    + x.router.param.*    路径参数
-+ router   新路由中间件
+    + x.router.param.*  路径参数
++ router    新路由中间件
 	+ router.meta		路由元数据
-    + router.param.*   路径参数
+    + router.param.*    路径参数
+
++ hot 		动态模块加载扩展
+	+ ext.hot			*Hot
 
 > **注意：请尽量使用中间件包中提供的标准方法、常量读取上下文数据，防止内部逻辑修改导致的向后不兼容。**
 

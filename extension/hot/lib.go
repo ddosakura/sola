@@ -8,6 +8,7 @@ import (
 	"path"
 	"plugin"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -92,6 +93,21 @@ func New(o *Option) (*Hot, error) {
 	}
 
 	return h, nil
+}
+
+// Used by Sola App
+func (h *Hot) Used(app *sola.Sola) {
+	app.Use(func(next sola.Handler) sola.Handler {
+		return func(c sola.Context) error {
+			c.Set(CtxHot, h)
+			return next(c)
+		}
+	})
+}
+
+// Modules from context
+func Modules(c sola.Context) *Hot {
+	return c.Get(CtxHot).(*Hot)
 }
 
 // Scan Hot Plugin
@@ -215,33 +231,42 @@ func (t *timer) update() {
 
 func load(h *Hot, dir string) {
 	log.Println("load", dir)
-	hash := strconv.Itoa(int(time.Now().Unix()))
-	path := h.option.TmpDir + "/" + hash
-	if e := run("cp", "-r", dir, path); e != nil {
-		log.Println(e)
-		return
-	}
-	dir = path
-	path += "/plugin.so"
-	if e := run(
-		"go",
-		"build",
-		"-buildmode=plugin",
-		"-o",
-		path,
-		dir,
-	); e != nil {
-		log.Println(e)
-		return
-	}
-	p, e := plugin.Open(path)
-	if e != nil {
-		log.Println(e)
-		return
-	}
-	if e := run("rm", "-r", dir); e != nil {
-		log.Println(e)
-		return
+	var p *plugin.Plugin
+	if strings.HasSuffix(dir, ".so") {
+		var e error
+		if p, e = plugin.Open(dir); e != nil {
+			log.Println(e)
+			return
+		}
+	} else {
+		hash := strconv.Itoa(int(time.Now().Unix()))
+		path := h.option.TmpDir + "/" + hash
+		var e error
+		if e = run("cp", "-r", dir, path); e != nil {
+			log.Println(e)
+			return
+		}
+		dir = path
+		path += "/plugin.so"
+		if e = run(
+			"go",
+			"build",
+			"-buildmode=plugin",
+			"-o",
+			path,
+			dir,
+		); e != nil {
+			log.Println(e)
+			return
+		}
+		if p, e = plugin.Open(path); e != nil {
+			log.Println(e)
+			return
+		}
+		if e = run("rm", "-r", dir); e != nil {
+			log.Println(e)
+			return
+		}
 	}
 
 	go func() {
