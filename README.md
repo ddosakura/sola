@@ -118,6 +118,9 @@ type (
 	// Context for Middleware
 	Context interface {
 		// Set/Get
+		Store() map[string]interface{}
+		Origin() Context
+		Shadow() Context
 		Set(key string, value interface{})
 		Get(key string) interface{}
 
@@ -141,8 +144,9 @@ type (
 		Handle(code int) Handler
 	}
 	context struct {
-		lock  sync.RWMutex
-		store map[string]interface{}
+		origin Context
+		lock   sync.RWMutex
+		store  map[string]interface{}
 	}
 
 	// Handler func
@@ -199,7 +203,7 @@ type (
 + [x] x/router  旧路由中间件 (@deprecated 预计在 v2.2.x 移除)
 + [x] router	新路由中间件
 
-#### xrouter 匹配规则
+#### router 匹配规则
 
 + 完整版 `GET localhost:3000/user/:id` (注意 Host 直接匹配 *http.Request 中的 Host)
 + 不指定 Method `localhost:3000/user/:id`

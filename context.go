@@ -16,6 +16,19 @@ func newContext() *context {
 
 // === Set/Get ===
 
+// Store of Context (include origin)
+func (c *context) Store() (s map[string]interface{}) {
+	if c.origin == nil || c.origin == c {
+		s = make(map[string]interface{})
+	} else {
+		s = c.origin.Store()
+	}
+	for k, v := range c.store {
+		s[k] = v
+	}
+	return
+}
+
 // Origin Context
 func (c *context) Origin() Context {
 	return c.origin

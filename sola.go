@@ -11,6 +11,7 @@ type (
 	// Context for Middleware
 	Context interface {
 		// Set/Get
+		Store() map[string]interface{}
 		Origin() Context
 		Shadow() Context
 		Set(key string, value interface{})
