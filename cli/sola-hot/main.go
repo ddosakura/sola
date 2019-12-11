@@ -121,7 +121,7 @@ func eventDispatcher(event fsnotify.Event) {
 	case
 		fsnotify.Write,
 		fsnotify.Rename:
-		if ext == ".go" {
+		if ext == ".go" || ext == ".yml" {
 			// log.Println("EVENT", event.Op.String(), event.Name)
 			ch <- struct{}{}
 			go throttle()

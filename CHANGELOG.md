@@ -4,6 +4,26 @@
 
 ### Bug Fixes
 
++ sola-hot 监听 *.yml
+
+### Features
+
++ 无
+
+#### Next Version
+
++ v2.2.x
+    + context 核心化
+    + 移除 x/router
+
+### Breaking Changes
+
++ 无
+
+## v2.1.1
+
+### Bug Fixes
+
 + 新路由中间件省缺路径，仅指定方法
 + 由于 endless 无法在 Windows 下运行，单独给 linux 写平滑切换
 
