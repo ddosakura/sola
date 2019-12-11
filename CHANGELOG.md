@@ -15,11 +15,13 @@
 + 增加热更新工具 `sola-hot`
 + 增加动态模块加载扩展
 + Context 获取 Store (包括 Origin 的 Store)
++ 反向代理功能完善
 
 #### Next Version
 
 + v2.2.x
-    + 反向代理功能完善
+    + context 核心化
+    + 移除 x/router
 
 ### Breaking Changes
 

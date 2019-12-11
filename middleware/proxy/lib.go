@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/ddosakura/sola/v2"
 	lua "github.com/yuin/gopher-lua"
@@ -40,6 +41,17 @@ func New(script string) sola.Middleware {
 				w.Header().Add(key, value)
 				return 0
 			}))
+			urls := []*url.URL{}
+			L.SetGlobal("proxy", L.NewFunction(func(L *lua.LState) int {
+				uri := L.ToString(1)
+				var URL *url.URL
+				var e error
+				if URL, e = url.Parse(uri); e != nil {
+					return -1
+				}
+				urls = append(urls, URL)
+				return 0
+			}))
 			if err := L.DoString(script); err != nil {
 				return err
 			}
@@ -64,6 +76,12 @@ func New(script string) sola.Middleware {
 			code := int(ret.(lua.LNumber))
 			data := L.Get(-1).String()
 			switch code {
+			case 0:
+				if h := Balance(c, urls); h != nil {
+					// h.ErrorHandler = ?
+					h.ServeHTTP(w, r)
+				}
+				return nil
 			case http.StatusOK:
 				return c.String(code, data)
 			case http.StatusMovedPermanently:
