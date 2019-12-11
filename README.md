@@ -199,7 +199,7 @@ type (
 	+ [x] backup    301 to other host - e.g. http -> https
 	+ [x] favicon   301 to Online Favicon
 	+ 嵌入 lua 脚本：https://github.com/yuin/gopher-lua
-	+ [ ] 完善
+	+ [x] 负载均衡
 + [x] rest      RESTful API 中间件
 + [x] swagger   API 文档中间件
 + [x] ws		WebSocket 中间件

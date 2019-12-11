@@ -15,7 +15,7 @@
 + 增加热更新工具 `sola-hot`
 + 增加动态模块加载扩展
 + Context 获取 Store (包括 Origin 的 Store)
-+ 反向代理功能完善
++ 反向代理功能完善 - 负载均衡
 
 #### Next Version
 
