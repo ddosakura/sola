@@ -4,6 +4,10 @@ A simple golang web framwork based middleware.
 
 + [Change Log](./CHANGELOG.md)
 
+## 内部错误（无法修复）
+
++ v2.1.0 & v2.1.1 内部版本号变量误标记为 `2.0.0`
+
 ## Quick Start
 
 基本的 sola 程序 (Hello World) 如下：

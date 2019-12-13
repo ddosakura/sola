@@ -1,14 +1,23 @@
 package router
 
 import (
+	"errors"
 	"net/http"
 	"strings"
 
 	"github.com/ddosakura/sola/v2"
 )
 
+// error(s)
+var (
+	ErrNoMatch = errors.New("no match")
+
+	errNoMatch = sola.IError(Issuer, ErrNoMatch)
+)
+
 // Ctx
 const (
+	Issuer         = "sola/router"
 	CtxMeta        = "router.meta"
 	CtxParamPrefix = "router.param."
 )

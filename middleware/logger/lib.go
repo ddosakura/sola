@@ -33,13 +33,11 @@ func New(bufSize int, h Handler) sola.Middleware {
 			}
 		}
 	}()
-	return func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			var tmp chan<- *Log = ch
-			c.Set(CtxLogger, tmp)
-			return next(c)
-		}
-	}
+	return sola.Handler(func(c sola.Context) error {
+		var tmp chan<- *Log = ch
+		c.Set(CtxLogger, tmp)
+		return nil
+	}).M()
 }
 
 // Printf to Logger

@@ -48,6 +48,15 @@ type (
 	// Middleware func
 	Middleware func(Handler) Handler
 
+	// C alias of Context
+	C Context
+
+	// H alias of Handler
+	H Handler
+
+	// M func
+	M func(c C, next H) error
+
 	// Sola App
 	Sola struct {
 		// core
@@ -69,8 +78,10 @@ type (
 func New() *Sola {
 	return &Sola{
 		middlewares: []Middleware{},
-		handlers:    map[int]Handler{},
-		orm:         map[string]*gorm.DB{},
+		handlers: map[int]Handler{
+			HandleCodePass: HandlePass,
+		},
+		orm: map[string]*gorm.DB{},
 	}
 }
 
@@ -96,6 +107,10 @@ func (s *Sola) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if s.ErrorHandler != nil {
 			s.ErrorHandler(err, c)
 		} else if s.devMode {
+			if ie, ok := err.(*InternalError); ok {
+				ie.Write(w)
+				return
+			}
 			c.String(http.StatusInternalServerError, err.Error())
 		} else {
 			c.String(http.StatusInternalServerError, "Internal Server Error")

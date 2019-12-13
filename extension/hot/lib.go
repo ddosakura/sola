@@ -97,12 +97,10 @@ func New(o *Option) (*Hot, error) {
 
 // Used by Sola App
 func (h *Hot) Used(app *sola.Sola) {
-	app.Use(func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			c.Set(CtxHot, h)
-			return next(c)
-		}
-	})
+	app.Use(sola.Handler(func(c sola.Context) error {
+		c.Set(CtxHot, h)
+		return nil
+	}).M())
 }
 
 // Modules from context
@@ -176,17 +174,15 @@ func (h *Hot) Handler(k string) sola.Handler {
 
 // Middleware Getter
 func (h *Hot) Middleware(k string) sola.Middleware {
-	return func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			h.lm.RLock()
-			defer h.lm.RUnlock()
-			log.Println("use middleware:", k)
-			if x := h.middlewares[k]; x != nil {
-				return x(next)(c)
-			}
-			return next(c)
+	return sola.M(func(c sola.C, next sola.H) error {
+		h.lm.RLock()
+		defer h.lm.RUnlock()
+		log.Println("use middleware:", k)
+		if x := h.middlewares[k]; x != nil {
+			return x(next)(c)
 		}
-	}
+		return next(c)
+	}).Must(NotFound(k))
 }
 
 type timer struct {

@@ -1,26 +1,39 @@
 # Change Log
 
-## v2.1.1
+## v2.1.2
 
 ### Bug Fixes
 
 + sola-hot 监听 *.yml
++ 使用 Handler/Middleware 互转等工具方法优化代码，防止 nil 错误
++ [ ] hot print log only in debug mode
 
 ### Features
 
-+ 无
++ `(*router.Router).Bind(pattern string, h sola.Handler, ms ...sola.Middleware)`
++ Default Sola App (`DefaultApp`)
++ `sola` -> `Listen*` 支持多 App 参数，默认监听 `DefaultApp`
++ 增加 `sola.ListenKeep`/`sola.ListenKeepTLS`
++ Handler/Middleware 互转工具方法，Handler/Middleware Must 防止 nil 错误
++ C/H/M 语法糖
++ Pass Handler
++ 内部错误 & InternalError Handler
 
-#### Next Version
+### Breaking Changes
 
++ v2.1.0 & v2.1.1 内部版本号变量误标记为 `2.0.0`，从 v2.1.2 开始该变量格式变更为 `v2.x.x`
++ 移除 `native.From`/`native.FromFunc`，使用 `sola.FromHandler`/`sola.FromHandlerFunc`
++ 移除 `(Handler).Adapter() func(http.ResponseWriter, *http.Request, error)`，适配模块采用 `(Handler).ToHandler`/`(Handler).ToHandlerFunc`
+
+### Next Version
+
++ v2.1.3
+    + 检查所有 `M()` 是否需要替换为 `Must()`
 + v2.2.x
     + context 核心化
     + 移除 x/router
 
-### Breaking Changes
-
-+ 无
-
-## v2.1.1
+## v2.1.1 (2019-12-11)
 
 ### Bug Fixes
 

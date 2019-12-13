@@ -77,28 +77,26 @@ func signBase(next sola.Handler) sola.Handler {
 }
 
 func signJWT(key interface{}) sola.Middleware {
-	return func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			tmp := c.Get(CtxClaims)
-			if tmp == nil {
-				return ErrNoClaims
-			}
-			claims := tmp.(map[string]interface{})
-			var tmp2 jwt.MapClaims = claims
-			token := jwt.NewWithClaims(jwt.SigningMethodHS256, tmp2)
-			t, err := token.SignedString(key)
-			if err != nil {
-				return err
-			}
-			c.SetCookie(&http.Cookie{
-				Path:  "/",
-				Name:  authCookieCacheKey,
-				Value: jwtAuthPrefix + t,
-			})
-			c.Set(CtxToken, t)
-			return next(c)
+	return sola.Handler(func(c sola.Context) error {
+		tmp := c.Get(CtxClaims)
+		if tmp == nil {
+			return ErrNoClaims
 		}
-	}
+		claims := tmp.(map[string]interface{})
+		var tmp2 jwt.MapClaims = claims
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, tmp2)
+		t, err := token.SignedString(key)
+		if err != nil {
+			return err
+		}
+		c.SetCookie(&http.Cookie{
+			Path:  "/",
+			Name:  authCookieCacheKey,
+			Value: jwtAuthPrefix + t,
+		})
+		c.Set(CtxToken, t)
+		return nil
+	}).M()
 }
 
 // Auth Token
@@ -115,21 +113,19 @@ func Auth(t Type, key interface{}) sola.Middleware {
 }
 
 func authBase(check BaseCheck) sola.Middleware {
-	return func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			r := c.Request()
-			w := c.Response()
-			username, password, ok := r.BasicAuth()
-			if !ok {
-				w.Header().Add("WWW-Authenticate", "Basic realm=\"sola\"")
-				return c.Handle(http.StatusUnauthorized)(c)
-			}
-			if check(username, password) {
-				return next(c)
-			}
-			return c.Handle(http.StatusForbidden)(c)
+	return sola.M(func(c sola.C, next sola.H) error {
+		r := c.Request()
+		w := c.Response()
+		username, password, ok := r.BasicAuth()
+		if !ok {
+			w.Header().Add("WWW-Authenticate", "Basic realm=\"sola\"")
+			return c.Handle(http.StatusUnauthorized)(c)
 		}
-	}
+		if check(username, password) {
+			return next(c)
+		}
+		return c.Handle(http.StatusForbidden)(c)
+	}).M()
 }
 
 const unexpectedSigningMethod = "Unexpected signing method: %v"
@@ -144,31 +140,29 @@ func jwtParse(key interface{}, tokenStr string) (*jwt.Token, error) {
 }
 
 func authJWT(key interface{}) sola.Middleware {
-	return func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			r := c.Request()
-			w := c.Response()
+	return sola.M(func(c sola.C, next sola.H) error {
+		r := c.Request()
+		w := c.Response()
 
-			auth := r.Header.Get("Authorization")
-			tokenString, ok := parseBearerAuth(auth)
-			if !ok {
-				w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
-				return c.Handle(http.StatusUnauthorized)(c)
-			}
-
-			token, _ := jwtParse(key, tokenString)
-
-			if token == nil {
-				w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
-				return c.Handle(http.StatusUnauthorized)(c)
-			}
-			if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-				var tmp map[string]interface{} = claims
-				c.Set(CtxClaims, tmp)
-				c.Set(CtxToken, tokenString)
-				return next(c)
-			}
-			return c.Handle(http.StatusForbidden)(c)
+		auth := r.Header.Get("Authorization")
+		tokenString, ok := parseBearerAuth(auth)
+		if !ok {
+			w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
+			return c.Handle(http.StatusUnauthorized)(c)
 		}
-	}
+
+		token, _ := jwtParse(key, tokenString)
+
+		if token == nil {
+			w.Header().Add("WWW-Authenticate", jwtAuthPrefix)
+			return c.Handle(http.StatusUnauthorized)(c)
+		}
+		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+			var tmp map[string]interface{} = claims
+			c.Set(CtxClaims, tmp)
+			c.Set(CtxToken, tokenString)
+			return next(c)
+		}
+		return c.Handle(http.StatusForbidden)(c)
+	}).M()
 }

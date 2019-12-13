@@ -50,19 +50,17 @@ func (r *Router) Sub(o *Option) *Router {
 		meta:        meta,
 		middlewares: []sola.Middleware{},
 	}
-	fn := func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			if ctx := match(c, false, meta); ctx != nil {
-				NEXT := next
-				if o.UseNotFound {
-					NEXT = c.Handle(http.StatusNotFound)
-				}
-				return sub.preHandle()(sola.OriginContext(NEXT))(ctx)
+	m := sola.M(func(c sola.C, next sola.H) error {
+		if ctx := match(c, false, meta); ctx != nil {
+			NEXT := sola.Handler(next)
+			if o.UseNotFound {
+				NEXT = c.Handle(http.StatusNotFound)
 			}
-			return next(c)
+			return sub.preHandle()(sola.OriginContext(NEXT))(ctx)
 		}
-	}
-	r.middlewares = append(r.middlewares, fn)
+		return next(c)
+	}).M()
+	r.middlewares = append(r.middlewares, m)
 	return sub
 }
 
@@ -74,29 +72,26 @@ func (r *Router) Use(ms ...sola.Middleware) {
 // Bind Handler
 func (r *Router) Bind(pattern string, h sola.Handler, ms ...sola.Middleware) {
 	meta := buildMeta(pattern)
-	fn := func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			if ctx := match(c, true, meta); ctx != nil {
-				return sola.MergeFunc(h, ms...)(ctx)
-			}
-			return next(c)
+	m := sola.M(func(c sola.C, next sola.H) error {
+		if ctx := match(c, true, meta); ctx != nil {
+			return sola.MergeFunc(h, ms...)(ctx)
 		}
-	}
-	r.middlewares = append(r.middlewares, fn)
+		return next(c)
+	}).M()
+	r.middlewares = append(r.middlewares, m)
 }
 
 // Routes Middleware
 func (r *Router) Routes() sola.Middleware {
-	return func(next sola.Handler) sola.Handler {
-		return func(c sola.Context) error {
-			if ctx := match(c, false, r.meta); ctx != nil {
-				NEXT := next
-				if r.option.UseNotFound {
-					NEXT = c.Handle(http.StatusNotFound)
-				}
-				return r.preHandle()(sola.OriginContext(NEXT))(ctx)
+	m := sola.M(func(c sola.C, next sola.H) error {
+		if ctx := match(c, false, r.meta); ctx != nil {
+			NEXT := sola.Handler(next)
+			if r.option.UseNotFound {
+				NEXT = c.Handle(http.StatusNotFound)
 			}
-			return next(c)
+			return r.preHandle()(sola.OriginContext(NEXT))(ctx)
 		}
-	}
+		return next(c)
+	})
+	return m.Must(errNoMatch.Handler())
 }

@@ -9,6 +9,16 @@ func (s *Sola) SetHandler(code int, h Handler) {
 	s.handlers[code] = h
 }
 
+// Custom Handle Code
+const (
+	HandleCodePass = iota
+)
+
+// HandlePass Handler
+var HandlePass = Handler(func(c Context) error {
+	return nil
+})
+
 // Handle Selector
 func (c *context) Handle(code int) Handler {
 	fn := c.Sola().handlers[code]
