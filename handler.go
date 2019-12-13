@@ -38,13 +38,3 @@ func (c *context) Handle(code int) Handler {
 	}
 	return fn
 }
-
-// Adapter for net/http
-func (h Handler) Adapter() func(http.ResponseWriter, *http.Request, error) {
-	return func(w http.ResponseWriter, r *http.Request, e error) {
-		c := newContext()
-		c.Set(CtxRequest, r)
-		c.Set(CtxResponse, w)
-
-	}
-}
