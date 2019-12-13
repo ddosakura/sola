@@ -2,7 +2,6 @@ package hot
 
 import (
 	"errors"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -31,6 +30,7 @@ type Hot struct {
 
 // Option of Hot Plugin
 type Option struct {
+	Log    bool
 	TmpDir string
 	Init   []string
 	Watch  []string
@@ -120,7 +120,8 @@ func (h *Hot) Scan() {
 			h.eventDispatcher(event)
 		case err, ok := <-h.watcher.Errors:
 			if !ok {
-				log.Fatalln(err)
+				h.log(err)
+				os.Exit(1)
 			}
 		}
 	}
@@ -134,7 +135,7 @@ func (h *Hot) eventDispatcher(event fsnotify.Event) {
 		fsnotify.Write,
 		fsnotify.Rename:
 		if ext == ".go" {
-			log.Println("EVENT", event.Op.String(), event.Name)
+			h.log("EVENT", event.Op.String(), event.Name)
 			h.lock.Lock()
 			t := h.timers[dir]
 			if t == nil {
@@ -164,7 +165,7 @@ func (h *Hot) Handler(k string) sola.Handler {
 	return func(c sola.Context) error {
 		h.lh.RLock()
 		defer h.lh.RUnlock()
-		log.Println("use handler:", k)
+		h.log("use handler:", k)
 		if x := h.handlers[k]; x != nil {
 			return x(c)
 		}
@@ -177,9 +178,9 @@ func (h *Hot) Middleware(k string) sola.Middleware {
 	return sola.M(func(c sola.C, next sola.H) error {
 		h.lm.RLock()
 		defer h.lm.RUnlock()
-		log.Println("use middleware:", k)
+		h.log("use middleware:", k)
 		if x := h.middlewares[k]; x != nil {
-			return x(next)(c)
+			return x(sola.Handler(next))(c)
 		}
 		return next(c)
 	}).Must(NotFound(k))
@@ -201,7 +202,7 @@ func (t *timer) throttle() {
 		// fmt.Println("cancel ch")
 		return
 	case <-after:
-		log.Println("update plugins")
+		// fmt.Println("update plugins")
 		t.update()
 		go t.readch()
 		return
@@ -226,12 +227,12 @@ func (t *timer) update() {
 }
 
 func load(h *Hot, dir string) {
-	log.Println("load", dir)
+	h.log("load", dir)
 	var p *plugin.Plugin
 	if strings.HasSuffix(dir, ".so") {
 		var e error
 		if p, e = plugin.Open(dir); e != nil {
-			log.Println(e)
+			h.log(e)
 			return
 		}
 	} else {
@@ -239,7 +240,7 @@ func load(h *Hot, dir string) {
 		path := h.option.TmpDir + "/" + hash
 		var e error
 		if e = run("cp", "-r", dir, path); e != nil {
-			log.Println(e)
+			h.log(e)
 			return
 		}
 		dir = path
@@ -252,28 +253,28 @@ func load(h *Hot, dir string) {
 			path,
 			dir,
 		); e != nil {
-			log.Println(e)
+			h.log(e)
 			return
 		}
 		if p, e = plugin.Open(path); e != nil {
-			log.Println(e)
+			h.log(e)
 			return
 		}
 		if e = run("rm", "-r", dir); e != nil {
-			log.Println(e)
+			h.log(e)
 			return
 		}
 	}
 
 	go func() {
 		if exportH, e := p.Lookup("ExportHandler"); e != nil {
-			log.Println(e)
+			h.log(e)
 		} else {
 			h.lh.Lock()
 			defer h.lh.Unlock()
 			exportHandler := *exportH.(*map[string]sola.Handler)
 			for k := range exportHandler {
-				log.Println("load handler:", k)
+				h.log("load handler:", k)
 				h.loadHandler(k, exportHandler[k])
 			}
 		}
@@ -281,13 +282,13 @@ func load(h *Hot, dir string) {
 
 	go func() {
 		if exportM, e := p.Lookup("ExportMiddleware"); e != nil {
-			log.Println(e)
+			h.log(e)
 		} else {
 			h.lm.Lock()
 			defer h.lm.Unlock()
 			exportMiddleware := *exportM.(*map[string]sola.Middleware)
 			for k := range exportMiddleware {
-				log.Println("load middleware:", k)
+				h.log("load middleware:", k)
 				h.loadMiddleware(k, exportMiddleware[k])
 			}
 		}

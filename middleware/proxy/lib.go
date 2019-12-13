@@ -18,7 +18,7 @@ var (
 
 // New Proxy Middleware
 func New(script string) sola.Middleware {
-	return sola.MH(func(c sola.C, next sola.H) (e error) {
+	return sola.M(func(c sola.C, next sola.H) (e error) {
 		r := c.Request()
 		w := c.Response()
 		L := lua.NewState()

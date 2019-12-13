@@ -6,7 +6,7 @@
 
 + sola-hot 监听 *.yml
 + 使用 Handler/Middleware 互转等工具方法优化代码，防止 nil 错误
-+ [ ] hot print log only in debug mode
++ hot print log only in log mode
 
 ### Features
 
