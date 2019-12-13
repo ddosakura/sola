@@ -1,6 +1,6 @@
 # Change Log
 
-## v2.1.2
+## v2.1.2 (2019-12-14)
 
 ### Bug Fixes
 
@@ -22,7 +22,7 @@
 ### Breaking Changes
 
 + v2.1.0 & v2.1.1 内部版本号变量误标记为 `2.0.0`，从 v2.1.2 开始该变量格式变更为 `v2.x.x`
-+ 移除 `native.From`/`native.FromFunc`，使用 `sola.FromHandler`/`sola.FromHandlerFunc`
++ 移除 `native.FromFunc`，使用 `sola.FromHandler`/`sola.FromHandlerFunc` (保留 `native.From` 作为静态文件固定用法)
 + 移除 `(Handler).Adapter() func(http.ResponseWriter, *http.Request, error)`，适配模块采用 `(Handler).ToHandler`/`(Handler).ToHandlerFunc`
 
 ### Next Version

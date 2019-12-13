@@ -11,3 +11,6 @@ func Static(path, prefix string) sola.Middleware {
 	h := http.StripPrefix(prefix, http.FileServer(http.Dir(path)))
 	return sola.FromHandler(h).M()
 }
+
+// From http.Handler
+var From = sola.FromHandler

@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"errors"
 	"io"
 
 	"github.com/ddosakura/sola/v2"
@@ -25,17 +24,6 @@ type Option struct {
 	SendError    ErrorHandler
 	HandlerError ErrorHandler
 }
-
-// meta
-var (
-	ALL = [16]byte{}
-)
-
-// error(s)
-var (
-	ErrOption = errors.New("Must set Handler")
-	ErrNoUUID = errors.New("No UUID")
-)
 
 func first(uuid.UUID)       {}
 func pass(uuid.UUID, error) {}
@@ -80,7 +68,7 @@ func New(o *Option) (sola.Handler, Send) {
 		}
 		w := m[UUID]
 		if w == nil {
-			return ErrNoUUID
+			return errNoUUID
 		}
 		go sendMessage(o, UUID, m[UUID], v)
 		return nil

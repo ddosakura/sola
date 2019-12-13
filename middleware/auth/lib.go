@@ -80,7 +80,7 @@ func signJWT(key interface{}) sola.Middleware {
 	return sola.Handler(func(c sola.Context) error {
 		tmp := c.Get(CtxClaims)
 		if tmp == nil {
-			return ErrNoClaims
+			return errNoClaims
 		}
 		claims := tmp.(map[string]interface{})
 		var tmp2 jwt.MapClaims = claims

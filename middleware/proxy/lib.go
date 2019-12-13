@@ -1,19 +1,12 @@
 package proxy
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 
 	"github.com/ddosakura/sola/v2"
 	lua "github.com/yuin/gopher-lua"
-)
-
-// error(s)
-var (
-	ErrLuaScriptReturn = errors.New("Lua Script should return (int, string)")
-	ErrUnsupportCode   = errors.New("Lua Script only support 200, 301")
 )
 
 // New Proxy Middleware
@@ -70,7 +63,7 @@ func New(script string) sola.Middleware {
 			return next(c)
 		}
 		if ret.Type() != lua.LTNumber {
-			return ErrLuaScriptReturn
+			return errLuaScriptReturn
 		}
 		code := int(ret.(lua.LNumber))
 		data := L.Get(-1).String()
@@ -88,6 +81,6 @@ func New(script string) sola.Middleware {
 			w.WriteHeader(http.StatusMovedPermanently)
 			return nil
 		}
-		return ErrUnsupportCode
+		return errUnsupportCode
 	}).M()
 }
