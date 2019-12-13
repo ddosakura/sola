@@ -72,12 +72,12 @@ func (r *Router) Use(ms ...sola.Middleware) {
 }
 
 // Bind Handler
-func (r *Router) Bind(pattern string, h sola.Handler) {
+func (r *Router) Bind(pattern string, h sola.Handler, ms ...sola.Middleware) {
 	meta := buildMeta(pattern)
 	fn := func(next sola.Handler) sola.Handler {
 		return func(c sola.Context) error {
 			if ctx := match(c, true, meta); ctx != nil {
-				return h(ctx)
+				return sola.MergeFunc(h, ms...)(ctx)
 			}
 			return next(c)
 		}
